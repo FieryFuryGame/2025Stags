@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -69,7 +71,12 @@ public class RobotContainer {
         
         // Control Once Both Vision And Swerve Work
         // Constants.OperatorConstants.driverController.povUp().whileTrue(Commands.run(() -> limelight.functionName(), limelight));
-
+        
+        /*  TalonFX talonFX = new TalonFX(0);
+            double pos = talonFX.getPosition().getValueAsDouble();
+            MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0).withPosition(0);
+            talonFX.setControl(positionVoltage.withPosition(pos)); */
+            
         Constants.OperatorConstants.driverController.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
