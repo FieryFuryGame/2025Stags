@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -18,5 +21,19 @@ public final class Constants {
   public static class OperatorConstants {
     public static final CommandXboxController driverController = new CommandXboxController(0);
     public static final CommandXboxController operatorController = new CommandXboxController(1);
+  }
+
+  public static class ElevatorConstants {
+    public static final int ElevatorMotorAID = 9;
+    // PID for motor A
+    public static final double akS = 0.25, akV = 0.12, akA = 0.01, akP = 4.8, akI = 0, akD = 0.1;
+    // Motion Magic Config A
+    public static final double ammCruiseVelocity = 80, ammAccel = 160, ammJerk = 1600;
+
+    public static final int ElevatorMotorBID = 10;
+    // PID for motor B
+    public static final double bkS = 0.25, bkV = 0.12, bkA = 0.01, bkP = 4.8, bkI = 0, bkD = 0.1;
+    // Motion Magic Config B
+    public static final double bmmCruiseVelocity = 80, bmmAccel = 160, bmmJerk = 1600;
   }
 }
