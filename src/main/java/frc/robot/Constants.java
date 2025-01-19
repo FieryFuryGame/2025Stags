@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**

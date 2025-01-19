@@ -3,8 +3,10 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -16,7 +18,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ElevatorSubsystem() {
         setMotorSettings();
     }
-
     public void setMotorSettings() {
 
         // Settings For Motor A
@@ -53,21 +54,34 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     // povUp L4, povLeft L3, povRight L2, povDown L1
+    MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
 
     public void setLevelOne() {
-
+        elevatorMotorA.setControl(positionVoltage.withPosition(10));
+        elevatorMotorB.setControl(positionVoltage.withPosition(10));
     }
 
     public void setLevelTwo() {
-
+        elevatorMotorA.setControl(positionVoltage.withPosition(30));
+        elevatorMotorB.setControl(positionVoltage.withPosition(30));
     }
 
     public void setLevelThree() {
-
+        elevatorMotorA.setControl(positionVoltage.withPosition(50));
+        elevatorMotorB.setControl(positionVoltage.withPosition(50));
     }
 
     public void setLevelFour() {
-        
+        elevatorMotorA.setControl(positionVoltage.withPosition(70));
+        elevatorMotorB.setControl(positionVoltage.withPosition(70));
     }
+
+    public Command setVoltage(double power) {
+        return runOnce(() -> {
+            elevatorMotorA.setVoltage(power);
+            elevatorMotorB.setVoltage(power);
+        });
+    }
+    
 
 }
