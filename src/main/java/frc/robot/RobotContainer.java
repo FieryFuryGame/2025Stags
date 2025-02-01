@@ -11,6 +11,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,7 +41,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+    // public final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
     public final Limelight limelight = new Limelight("limelight", drivetrain);
 
     /* Path follower */
@@ -59,9 +60,11 @@ public class RobotContainer {
 
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
+            
+
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Constants.OperatorConstants.driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Constants.OperatorConstants.driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-Constants.OperatorConstants.driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -70,6 +73,7 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Constants.OperatorConstants.driverController.getLeftY(), -Constants.OperatorConstants.driverController.getLeftX()))
         ));
+
         
         // Control Once Both Vision And Swerve Work
         // Constants.OperatorConstants.driverController.povUp().whileTrue(Commands.run(() -> limelight.functionName(), limelight));
@@ -97,7 +101,7 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         Constants.OperatorConstants.driverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
+        /*
         Constants.OperatorConstants.operatorController.leftBumper()
             .whileTrue(m_elevator.setVoltage(0.05))
             .onFalse(m_elevator.setVoltage(0));
@@ -109,7 +113,7 @@ public class RobotContainer {
         Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> m_elevator.setLevelTwo()));
         Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> m_elevator.setLevelThree()));
         Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> m_elevator.setLevelFour()));
-
+        */
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 

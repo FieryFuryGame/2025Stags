@@ -1,0 +1,17 @@
+1. Center on an AprilTag at the reef
+ - Get tag ID
+ - Get distance from AprilTag
+ - 
+2. Get center left branch and center right branch measurements.
+3. 
+
+Rotate parallel to AT
+Get distance to AT
+Find Adjacent Using The Fact We Are 45 degrees
+Find Opposite
+Subtract Known Offsets Adjacent and Opposite (Subtract If Left, Add If Right)
+Use Pythagorean To Find Hypotenuse
+
+Drive That
+
+
