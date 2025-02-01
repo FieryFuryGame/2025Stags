@@ -1,9 +1,13 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Limelight extends SubsystemBase {
@@ -13,12 +17,14 @@ public class Limelight extends SubsystemBase {
     NetworkTable table;
 
     CommandSwerveDrivetrain drivetrain;
+    Pigeon2 pigeon2;
     
     int tv;
     double tx;
     double ty;
     double ta;
     int tid;
+    public int teamAdd = 0;
 
     InterpolatingDoubleTreeMap areaMap = new InterpolatingDoubleTreeMap();
 
@@ -40,6 +46,7 @@ public class Limelight extends SubsystemBase {
         setupMap();
         name = limelightName;
         drivetrain = swerve;
+        pigeon2 = drivetrain.getPigeon2();
         table = tableInstance.getTable(limelightName);
     }
 
@@ -61,10 +68,42 @@ public class Limelight extends SubsystemBase {
 
         //calculate distance
         double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+        
         return distanceFromLimelightToGoalInches;
     }
 
-    
+    public Command leftBranchRotate() {
+        int x = determineRotateDirection();
+        return run(() -> {
+            
+            switch (x) {
+                case 1:
+
+                    break;
+                case 2:
+                    break;
+                case 0:
+                    break;
+            }
+        });
+    }
+
+    public void rotateLeft() {
+
+    }
+    public void rotateRight() {
+
+    }
+
+    public int determineRotateDirection() {
+        if (tx > 0) {
+            return 1;
+        } else if (tx < 0) {
+            return 2;
+        } else {
+            return 0;
+        }
+    }
 
     @Override
     public void periodic() {
@@ -73,9 +112,7 @@ public class Limelight extends SubsystemBase {
         ty = table.getValue("ty").getDouble();
         tid = (int) table.getValue("tid").getDouble();
         ta = table.getValue("ta").getDouble();
-
+        SmartDashboard.putNumber("tr", MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0,360));
         SmartDashboard.putNumber("td", areaMap.get(ta)); // Target Distance
-        
     }
-
 }

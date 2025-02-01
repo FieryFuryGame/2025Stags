@@ -4,9 +4,13 @@
 
 package frc.robot;
 
+import java.lang.StackWalker.Option;
+import java.util.Optional;
+
 import com.ctre.phoenix6.Utils;
 
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -60,6 +64,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    if(DriverStation.getAlliance().equals(Optional.of(DriverStation.Alliance.Red))) {
+      m_robotContainer.limelight.teamAdd = 180;
+    } else {
+      m_robotContainer.limelight.teamAdd = 0;
+    }
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -75,6 +85,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    if(DriverStation.getAlliance().equals(Optional.of(DriverStation.Alliance.Red))) {
+      m_robotContainer.limelight.teamAdd = 180;
+    } else {
+      m_robotContainer.limelight.teamAdd = 0;
+    }
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

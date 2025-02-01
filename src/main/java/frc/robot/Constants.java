@@ -33,4 +33,21 @@ public final class Constants {
     // Motion Magic Config B
     public static final double bmmCruiseVelocity = 80, bmmAccel = 160, bmmJerk = 1600;
   }
+
+  public static class TagConstants {
+    public static final int Tag9Angle = 300;
+    public static final int Tag8Angle = 240;
+    public static final int Tag7Angle = 180;
+    public static final int Tag6Angle = 120;
+    public static final int Tag11Angle = 60;
+    public static final int Tag10Angle = 0;
+
+    public static final int Tag19Angle = 300;
+    public static final int Tag20Angle = 240;
+    public static final int Tag21Angle = 180;
+    public static final int Tag22Angle = 120;
+    public static final int Tag17Angle = 60;
+    public static final int Tag18Angle = 0;
+
+  }
 }
