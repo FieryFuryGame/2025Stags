@@ -1,8 +1,14 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -12,8 +18,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.generated.TunerConstants;
 
 public class Limelight extends SubsystemBase {
+
+    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     String name;
     NetworkTableInstance tableInstance = NetworkTableInstance.getDefault();
@@ -77,11 +91,12 @@ public class Limelight extends SubsystemBase {
     }
 
     public Command rotateToTag() {
+        System.out.println("Type");
         getTagAngle();
         int rotateDirection = decideRotationDirection();
-        return run(() -> {
-            
-        }).unless(() -> tagAngle == -1).until(() -> SmartDashboard.getNumber("tr", 0.0) <= tagAngle + 2 && SmartDashboard.getNumber("tr", 0.0) > tagAngle - 2);
+        return drivetrain.applyRequest(() ->
+            drive.withRotationalRate(1 * rotateDirection * MaxAngularRate)).unless(() -> tagAngle != -1)
+                .until(() -> SmartDashboard.getNumber("tr", 0.0) <= tagAngle + 2 && SmartDashboard.getNumber("tr", 0.0) > tagAngle - 2);
     }
 
     public void getTagAngle() {
@@ -131,9 +146,9 @@ public class Limelight extends SubsystemBase {
 
     public int decideRotationDirection() {
         if (tx < 0) {
-            return 1;
-        } else {
             return -1;
+        } else {
+            return 1;
         }
     }
 
