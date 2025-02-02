@@ -1,9 +1,7 @@
 1. Center on an AprilTag at the reef
  - Get tag ID
  - Get distance from AprilTag
- - 
 2. Get center left branch and center right branch measurements.
-3. 
 
 Rotate parallel to AT
 Get distance to AT
@@ -13,4 +11,11 @@ Subtract Known Offsets Adjacent and Opposite (Subtract If Left, Add If Right)
 Use Pythagorean To Find Hypotenuse
 Drive That
 
-
+To Rotate Parallel (Facing):
+1. Get angle the robot is currently facing towards, using a rotation on the gyrometer.
+2. Get angles that are opposite to the angle the AprilTags are facing, based on field info.
+3. Check if an AprilTag is seen, and get the angle to rotate towards based on the ID of the tag.
+4. Check if the robot is looking to the left or right of the AprilTag.
+5. Begin rotating in that direction, by basically simulating a controller input constantly.
+6. Stop when you reach the correct angle.
+7. Begin next step.
