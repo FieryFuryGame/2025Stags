@@ -48,6 +48,5 @@ public final class Constants {
     public static final int Tag22Angle = 120;
     public static final int Tag17Angle = 60;
     public static final int Tag18Angle = 0;
-
   }
 }

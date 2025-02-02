@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.MathUtil;
@@ -9,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Limelight extends SubsystemBase {
 
@@ -25,6 +28,7 @@ public class Limelight extends SubsystemBase {
     double ta;
     int tid;
     public int teamAdd = 0;
+    int tagAngle;
 
     InterpolatingDoubleTreeMap areaMap = new InterpolatingDoubleTreeMap();
 
@@ -72,36 +76,64 @@ public class Limelight extends SubsystemBase {
         return distanceFromLimelightToGoalInches;
     }
 
-    public Command leftBranchRotate() {
-        int x = determineRotateDirection();
+    public Command rotateToTag() {
+        getTagAngle();
+        int rotateDirection = decideRotationDirection();
         return run(() -> {
             
-            switch (x) {
-                case 1:
-
-                    break;
-                case 2:
-                    break;
-                case 0:
-                    break;
-            }
-        });
+        }).unless(() -> tagAngle == -1).until(() -> SmartDashboard.getNumber("tr", 0.0) <= tagAngle + 2 && SmartDashboard.getNumber("tr", 0.0) > tagAngle - 2);
     }
 
-    public void rotateLeft() {
-
+    public void getTagAngle() {
+        switch (tid) {
+            case 6:
+                tagAngle = Constants.TagConstants.Tag6Angle;
+                break;
+            case 7:
+                tagAngle = Constants.TagConstants.Tag7Angle;
+                break;
+            case 8:
+                tagAngle = Constants.TagConstants.Tag8Angle;
+                break;
+            case 9:
+                tagAngle = Constants.TagConstants.Tag9Angle;
+                break;
+            case 10:
+                tagAngle = Constants.TagConstants.Tag10Angle;
+                break;
+            case 11:
+                tagAngle = Constants.TagConstants.Tag11Angle;
+                break;
+            case 17:
+                tagAngle = Constants.TagConstants.Tag17Angle;
+                break;
+            case 18:
+                tagAngle = Constants.TagConstants.Tag18Angle;
+                break;
+            case 19:
+                tagAngle = Constants.TagConstants.Tag19Angle;
+                break;
+            case 20:
+                tagAngle = Constants.TagConstants.Tag20Angle;
+                break;
+            case 21:
+                tagAngle = Constants.TagConstants.Tag21Angle;
+                break;
+            case 22:
+                tagAngle = Constants.TagConstants.Tag22Angle;
+                break;
+            default:
+                System.out.println("[Limelight] Incorrect tag!");
+                tagAngle = -1;
+                break;
+        }
     }
-    public void rotateRight() {
 
-    }
-
-    public int determineRotateDirection() {
-        if (tx > 0) {
+    public int decideRotationDirection() {
+        if (tx < 0) {
             return 1;
-        } else if (tx < 0) {
-            return 2;
         } else {
-            return 0;
+            return -1;
         }
     }
 
