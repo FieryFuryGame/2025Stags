@@ -4,14 +4,16 @@
 
 package frc.robot;
 
-import java.lang.StackWalker.Option;
 import java.util.Optional;
+import java.util.Random;
 
 import com.ctre.phoenix6.Utils;
 
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -22,8 +24,111 @@ public class Robot extends TimedRobot {
 
   private final boolean kUseLimelight = false;
 
+  Alert alert;
+
   public Robot() {
     m_robotContainer = new RobotContainer();
+    alert = new Alert("Loading Motivational Speech Framework...", AlertType.kInfo);
+    alert.set(true);
+  }
+
+  public void motivationalQuotes() {
+    Random random = new Random();
+    int choice = random.nextInt(30) + 1;
+    switch (choice) {
+      case 1:
+        alert.setText("");
+        break;
+      case 2:
+        alert.setText("");
+        break;
+      case 3:
+        alert.setText("");
+        break;
+      case 4:
+        alert.setText("");
+        break;
+      case 5:
+        alert.setText("");
+        break;
+      case 6:
+        alert.setText("");
+        break;
+      case 7:
+        alert.setText("");
+        break;
+      case 8:
+        alert.setText("");
+        break;
+      case 9:
+        alert.setText("");
+        break;
+      case 10:
+        alert.setText("");
+        break;
+      case 11:
+        alert.setText("");
+        break;
+      case 12:
+        alert.setText("");
+        break;
+      case 13:
+        alert.setText("");
+        break;
+      case 14:
+        alert.setText("");
+        break;
+      case 15:
+        alert.setText("");
+        break;
+      case 16:
+        alert.setText("");
+        break;
+      case 17:
+        alert.setText("");
+        break;
+      case 18:
+        alert.setText("");
+        break;
+      case 19:
+        alert.setText("");
+        break;
+      case 20:
+        alert.setText("");
+        break;
+      case 21:
+        alert.setText("");
+        break;
+      case 22:
+        alert.setText("");
+        break;
+      case 23:
+        alert.setText("");
+        break;
+      case 24:
+        alert.setText("");
+        break;
+      case 25:
+        alert.setText("");
+        break;
+      case 26:
+        alert.setText("");
+        break;
+      case 27:
+        alert.setText("");
+        break;
+      case 28:
+        alert.setText("");
+        break;
+      case 29:
+        alert.setText("");
+        break;
+      case 30:
+        alert.setText("");
+        break;
+        
+        
+    }
   }
 
   @Override
@@ -90,6 +195,8 @@ public class Robot extends TimedRobot {
     } else {
       m_robotContainer.limelight.teamAdd = 0;
     }
+    
+    motivationalQuotes();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
