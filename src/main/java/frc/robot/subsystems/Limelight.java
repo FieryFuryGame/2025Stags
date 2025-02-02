@@ -4,8 +4,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import java.util.function.BooleanSupplier;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -42,6 +40,7 @@ public class Limelight extends SubsystemBase {
     double ta;
     int tid;
     public int teamAdd = 0;
+    public int rotateDirection = 0;
     int tagAngle;
 
     InterpolatingDoubleTreeMap areaMap = new InterpolatingDoubleTreeMap();
@@ -91,11 +90,8 @@ public class Limelight extends SubsystemBase {
     }
 
     public Command rotateToTag() {
-        System.out.println("Type");
-        getTagAngle();
-        int rotateDirection = decideRotationDirection();
         return drivetrain.applyRequest(() ->
-            drive.withRotationalRate(1 * rotateDirection * MaxAngularRate)).unless(() -> tagAngle != -1)
+            drive.withRotationalRate(0.5 * rotateDirection * MaxAngularRate)).unless(() -> tagAngle != -1)
                 .until(() -> SmartDashboard.getNumber("tr", 0.0) <= tagAngle + 2 && SmartDashboard.getNumber("tr", 0.0) > tagAngle - 2);
     }
 
@@ -146,9 +142,9 @@ public class Limelight extends SubsystemBase {
 
     public int decideRotationDirection() {
         if (tx < 0) {
-            return -1;
-        } else {
             return 1;
+        } else {
+            return -1;
         }
     }
 
