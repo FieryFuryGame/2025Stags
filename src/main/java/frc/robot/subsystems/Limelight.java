@@ -91,8 +91,8 @@ public class Limelight extends SubsystemBase {
 
     public Command rotateToTag() {
         return drivetrain.applyRequest(() ->
-            drive.withRotationalRate(0.5 * rotateDirection * MaxAngularRate)).unless(() -> tagAngle != -1)
-                .until(() -> SmartDashboard.getNumber("tr", 0.0) <= tagAngle + 2 && SmartDashboard.getNumber("tr", 0.0) > tagAngle - 2);
+            drive.withRotationalRate(0.3 * rotateDirection * MaxAngularRate)).unless(() -> tagAngle == -1)
+                .until(() -> MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0, 360) <= tagAngle + 2 && MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0, 360) > tagAngle - 2);
     }
 
     public void getTagAngle() {

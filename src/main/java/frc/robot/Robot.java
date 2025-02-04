@@ -34,100 +34,122 @@ public class Robot extends TimedRobot {
 
   public void motivationalQuotes() {
     Random random = new Random();
-    int choice = random.nextInt(30) + 1;
+    int choice = random.nextInt(38) + 1;
     switch (choice) {
       case 1:
-        alert.setText("");
+        alert.setText("You can do it!");
         break;
       case 2:
-        alert.setText("");
+        alert.setText("Loading message failed: [click to view error]");
         break;
       case 3:
-        alert.setText("");
+        alert.setText("Nearly there!");
         break;
       case 4:
-        alert.setText("");
+        alert.setText("The other team isn't ahead by that much...");
         break;
       case 5:
-        alert.setText("");
+        alert.setText("You're the best");
         break;
       case 6:
-        alert.setText("");
+        alert.setText("Are you even reading these?");
         break;
       case 7:
-        alert.setText("");
+        alert.setText("Nice!");
         break;
       case 8:
-        alert.setText("");
+        alert.setText("It's not your fault.");
         break;
       case 9:
-        alert.setText("");
+        alert.setText("Go STAGS!");
         break;
       case 10:
-        alert.setText("");
+        alert.setText("GO GO GO!");
         break;
       case 11:
-        alert.setText("");
+        alert.setText("Happy little accidents!");
         break;
       case 12:
-        alert.setText("");
+        alert.setText("1262");
         break;
       case 13:
-        alert.setText("");
+        alert.setText("youtube.com/watch?v=dQw4w9WgXcQ");
         break;
       case 14:
-        alert.setText("");
+        alert.setText("Don't blame the coder, blame the code.");
         break;
       case 15:
-        alert.setText("");
+        alert.setText("May contain if statements");
         break;
       case 16:
-        alert.setText("");
+        alert.setText("Error: Math not mathing");
         break;
       case 17:
-        alert.setText("");
+        alert.setText("NOT WATERPROOF!");
         break;
       case 18:
-        alert.setText("");
+        alert.setText("-.-- --- ..- / .-- .- ... -. -.. / -.-- --- ..- .-. / - .. -- .");
         break;
       case 19:
-        alert.setText("");
+        alert.setText("FIRST");
         break;
       case 20:
-        alert.setText("");
+        alert.setText("Safety fifth!");
         break;
       case 21:
-        alert.setText("");
+        alert.setText("2025");
         break;
       case 22:
-        alert.setText("");
+        alert.setText("Do a flip!");
         break;
       case 23:
-        alert.setText("");
+        alert.setText("We love Bubbles!");
         break;
       case 24:
-        alert.setText("");
+        alert.setText("Let's go!");
         break;
       case 25:
-        alert.setText("");
+        alert.setText("Amazing!");
         break;
       case 26:
-        alert.setText("");
+        alert.setText("You learn from your mistakes.");
         break;
       case 27:
-        alert.setText("");
+        alert.setText("Your dad loves you, Charley");
         break;
       case 28:
-        alert.setText("");
+        alert.setText("Knock 'em out of the park!");
         break;
       case 29:
-        alert.setText("");
+        alert.setText("QWERTY");
         break;
       case 30:
-        alert.setText("");
+        alert.setText("One step at a time!");
         break;
-        
-        
+      case 31:
+        alert.setText("Do your best!");
+        break;
+      case 32:
+        alert.setText("We support the rich!");
+        break;
+      case 33:
+        alert.setText("Live, Laugh, Love!");
+        break;
+      case 34:
+        alert.setText("Keep going!");
+        break;
+      case 35:
+        alert.setText("Jonas was here!");
+        break;
+      case 36:
+        alert.setText("Nothing is impossible!");
+        break;
+      case 37:
+        alert.setText("We believe in you!");
+        break;
+      case 38:
+        alert.setText("Don't give up!");
+        break;
     }
   }
 
