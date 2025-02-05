@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import frc.robot.generated.TunerConstants;
 
 public class Limelight extends SubsystemBase {
@@ -23,7 +24,7 @@ public class Limelight extends SubsystemBase {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+    private final SwerveRequest.RobotCentric drive = new SwerveRequest.RobotCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
@@ -39,6 +40,8 @@ public class Limelight extends SubsystemBase {
     double ty;
     double ta;
     int tid;
+    double ThreeDRotationMeasurement;
+    double ThreeDDistanceMeasurement;
     public int teamAdd = 0;
     public int rotateDirection = 0;
     int tagAngle;
@@ -150,11 +153,18 @@ public class Limelight extends SubsystemBase {
 
     @Override
     public void periodic() {
+        LimelightHelpers.SetRobotOrientation(name, MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees(), 0, 360), 0, MathUtil.inputModulus(pigeon2.getPitch().getValueAsDouble(), 0, 360), 0, MathUtil.inputModulus(pigeon2.getRoll().getValueAsDouble(), 0, 360), 0);
+        
         tv = (int) table.getValue("tv").getDouble();
         tx = table.getValue("tx").getDouble();
         ty = table.getValue("ty").getDouble();
         tid = (int) table.getValue("tid").getDouble();
         ta = table.getValue("ta").getDouble();
+        ThreeDRotationMeasurement = table.getValue("botpose_orb_wpiblue").getDoubleArray()[5];
+        SmartDashboard.putNumber("llr", ThreeDRotationMeasurement);
+        ThreeDDistanceMeasurement = table.getValue("botpose_orb_wpiblue").getDoubleArray()[9];
+        SmartDashboard.putNumber("lld", ThreeDDistanceMeasurement);
+        
         SmartDashboard.putNumber("tr", MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0,360));
         SmartDashboard.putNumber("td", areaMap.get(ta)); // Target Distance
     }
