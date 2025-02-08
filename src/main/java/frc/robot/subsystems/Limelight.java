@@ -6,14 +6,20 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
@@ -45,6 +51,7 @@ public class Limelight extends SubsystemBase {
     public int teamAdd = 0;
     public int rotateDirection = 0;
     int tagAngle;
+    Pose2d targetPose;
 
     InterpolatingDoubleTreeMap areaMap = new InterpolatingDoubleTreeMap();
 
@@ -68,6 +75,7 @@ public class Limelight extends SubsystemBase {
         drivetrain = swerve;
         pigeon2 = drivetrain.getPigeon2();
         table = tableInstance.getTable(limelightName);
+        targetPose = drivetrain.getState().Pose;
     }
 
     public double getTargetDistanceMath() {
@@ -92,63 +100,57 @@ public class Limelight extends SubsystemBase {
         return distanceFromLimelightToGoalInches;
     }
 
-    public Command rotateToTag() {
-        return drivetrain.applyRequest(() ->
-            drive.withRotationalRate(0.3 * rotateDirection * MaxAngularRate)).unless(() -> tagAngle == -1)
-                .until(() -> MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0, 360) <= tagAngle + 2 && MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0, 360) > tagAngle - 2);
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints = new PathConstraints(
+        0.5, 0.2,
+        Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+    
+
+    public Command pathfind() {
+        // Since AutoBuilder is configured, we can use it to build pathfinding commands
+        return AutoBuilder.pathfindToPoseFlipped(
+            Constants.AlignmentConstants.I_BLUE,
+            constraints,
+            0.0 // Goal end velocity in meters/sec
+        );
     }
 
-    public void getTagAngle() {
-        switch (tid) {
-            case 6:
-                tagAngle = Constants.TagConstants.Tag6Angle;
+    public Command setPathfindPose() {
+        return Commands.runOnce(() -> {
+            var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+            switch (tid) {
+            case 18, 7:
+                targetPose = Constants.AlignmentConstants.A_BLUE;
+                System.out.println("A");
                 break;
-            case 7:
-                tagAngle = Constants.TagConstants.Tag7Angle;
+            case 19, 6:
+                targetPose = Constants.AlignmentConstants.K_BLUE;
+                System.out.println("B");
                 break;
-            case 8:
-                tagAngle = Constants.TagConstants.Tag8Angle;
+            case 20,  11:
+                targetPose = Constants.AlignmentConstants.I_BLUE;
+                System.out.println("C");
                 break;
-            case 9:
-                tagAngle = Constants.TagConstants.Tag9Angle;
+            case 21, 10:
+                targetPose = Constants.AlignmentConstants.G_BLUE;
+                System.out.println("D");
                 break;
-            case 10:
-                tagAngle = Constants.TagConstants.Tag10Angle;
+            case 22, 9:
+                targetPose = Constants.AlignmentConstants.E_BLUE;
+                System.out.println("E");
                 break;
-            case 11:
-                tagAngle = Constants.TagConstants.Tag11Angle;
-                break;
-            case 17:
-                tagAngle = Constants.TagConstants.Tag17Angle;
-                break;
-            case 18:
-                tagAngle = Constants.TagConstants.Tag18Angle;
-                break;
-            case 19:
-                tagAngle = Constants.TagConstants.Tag19Angle;
-                break;
-            case 20:
-                tagAngle = Constants.TagConstants.Tag20Angle;
-                break;
-            case 21:
-                tagAngle = Constants.TagConstants.Tag21Angle;
-                break;
-            case 22:
-                tagAngle = Constants.TagConstants.Tag22Angle;
+            case 17, 8:
+                targetPose = Constants.AlignmentConstants.C_BLUE;
+                System.out.println("F");
                 break;
             default:
-                System.out.println("[Limelight] Incorrect tag!");
-                tagAngle = -1;
+                System.out.println("I think there might be a problem.");
+                targetPose = llMeasurement.pose;
                 break;
-        }
-    }
-
-    public int decideRotationDirection() {
-        if (tx < 0) {
-            return 1;
-        } else {
-            return -1;
-        }
+            }
+        });
+            
     }
 
     @Override
