@@ -21,7 +21,6 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.Odometry;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -50,7 +49,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
-    public SwerveDriveOdometry odometry;
+    public SwerveDrivePoseEstimator m_poseEstimator;
 
     /** Swerve request to apply during robot-centric path following */
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
@@ -140,6 +139,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+        m_poseEstimator = new SwerveDrivePoseEstimator
+        (getKinematics(), 
+        getPigeon2().getRotation2d(), 
+        getState().ModulePositions, 
+        getState().Pose);
+        configureAutoBuilder();
     }
 
     /**
@@ -164,12 +169,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        odometry = new SwerveDriveOdometry(
-            getKinematics(), 
-            getPigeon2().getRotation2d(), 
-            getState().ModulePositions
-        );
-
         configureAutoBuilder();
     }
 
@@ -207,10 +206,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     private void configureAutoBuilder() {
+        var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
-                () -> updateOdometry(),   // Supplier of current robot pose
+                () -> llMeasurement.pose,   // Supplier of current robot pose
                 this::resetPose,         // Consumer for seeding pose against auto
                 () -> getState().Speeds, // Supplier of current robot speeds
                 // Consumer of ChassisSpeeds and feedforwards to drive the robot
@@ -221,9 +221,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 ),
                 new PPHolonomicDriveController(
                     // PID constants for translation
-                    new PIDConstants(2.5, 0, 0),
+                    new PIDConstants(10, 0, 0),
                     // PID constants for rotation
-                    new PIDConstants(5, 0, 0)
+                    new PIDConstants(7, 0, 0)
                 ),
                 config,
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
@@ -254,10 +254,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.quasistatic(direction);
-    }
-
-    public Pose2d updateOdometry() {
-        return odometry.update(getPigeon2().getRotation2d(), getState().ModulePositions);
     }
 
     /**
