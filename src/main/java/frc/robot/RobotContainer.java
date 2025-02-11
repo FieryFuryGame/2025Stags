@@ -67,7 +67,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getRightX(), 0.07) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getRightX(), 0.08) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
@@ -94,8 +94,10 @@ public class RobotContainer {
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
-        Constants.OperatorConstants.driverController.leftTrigger().onTrue(limelight.setPathfindPose().andThen(limelight.pathfind()));
-        Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight").pose)));
+        Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight").pose)).andThen(limelight.setPathfindPose()).andThen(limelight.pathfind()));
+        Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
+            System.out.println(AutoBuilder.getCurrentPose());
+        }));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.

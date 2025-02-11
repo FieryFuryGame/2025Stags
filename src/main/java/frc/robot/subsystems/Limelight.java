@@ -8,13 +8,16 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.generated.TunerConstants;
 
 public class Limelight extends SubsystemBase {
@@ -41,11 +45,12 @@ public class Limelight extends SubsystemBase {
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon2;
     
-    int tv;
-    double tx;
-    double ty;
-    double ta;
-    int tid;
+    NetworkTableEntry tv;
+    NetworkTableEntry tx;
+    NetworkTableEntry ty;
+    NetworkTableEntry ta;
+    NetworkTableEntry tid;
+    PoseEstimate visionPoseEstimate;
     double ThreeDRotationMeasurement;
     double ThreeDDistanceMeasurement;
     public int teamAdd = 0;
@@ -80,7 +85,7 @@ public class Limelight extends SubsystemBase {
 
     public double getTargetDistanceMath() {
 
-        double targetOffsetAngle_Vertical = ty;
+        double targetOffsetAngle_Vertical = ty.getDouble(0.0);
 
         // how many degrees back is your limelight rotated from perfectly vertical?
         double limelightMountAngleDegrees = 0.343;
@@ -109,17 +114,18 @@ public class Limelight extends SubsystemBase {
 
     public Command pathfind() {
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
-        return AutoBuilder.pathfindToPoseFlipped(
-            Constants.AlignmentConstants.I_BLUE,
-            constraints,
-            0.0 // Goal end velocity in meters/sec
+        return Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(visionPoseEstimate.pose.getX(), visionPoseEstimate.pose.getY()))).andThen(
+            AutoBuilder.pathfindToPoseFlipped(
+                Constants.AlignmentConstants.I_BLUE,
+                constraints,
+                0.0 // Goal end velocity in meters/sec
+            )
         );
     }
-
     public Command setPathfindPose() {
         return Commands.runOnce(() -> {
             var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-            switch (tid) {
+            switch ((int)tid.getDouble(0.0)) {
             case 18, 7:
                 targetPose = Constants.AlignmentConstants.A_BLUE;
                 System.out.println("A");
@@ -157,17 +163,16 @@ public class Limelight extends SubsystemBase {
     public void periodic() {
         LimelightHelpers.SetRobotOrientation(name, MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees(), 0, 360), 0, MathUtil.inputModulus(pigeon2.getPitch().getValueAsDouble(), 0, 360), 0, MathUtil.inputModulus(pigeon2.getRoll().getValueAsDouble(), 0, 360), 0);
         
-        tv = (int) table.getValue("tv").getDouble();
-        tx = table.getValue("tx").getDouble();
-        ty = table.getValue("ty").getDouble();
-        tid = (int) table.getValue("tid").getDouble();
-        ta = table.getValue("ta").getDouble();
-        ThreeDRotationMeasurement = table.getValue("botpose_orb_wpiblue").getDoubleArray()[5];
-        SmartDashboard.putNumber("llr", ThreeDRotationMeasurement);
-        ThreeDDistanceMeasurement = table.getValue("botpose_orb_wpiblue").getDoubleArray()[9];
-        SmartDashboard.putNumber("lld", ThreeDDistanceMeasurement);
+        tv = table.getEntry("tv");
+        tx = table.getEntry("tx");
+        ty = table.getEntry("ty");
+        tid = table.getEntry("tid");
+        ta = table.getEntry("ta");
+        visionPoseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         
         SmartDashboard.putNumber("tr", MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0,360));
-        SmartDashboard.putNumber("td", areaMap.get(ta)); // Target Distance
+        SmartDashboard.putNumber("td", areaMap.get(ta.getDouble(0.0))); // Target Distance
+
+        
     }
 }
