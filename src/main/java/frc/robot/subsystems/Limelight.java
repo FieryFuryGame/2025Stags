@@ -114,7 +114,7 @@ public class Limelight extends SubsystemBase {
 
     public Command pathfind() {
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
-        return Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(visionPoseEstimate.pose.getX(), visionPoseEstimate.pose.getY()))).andThen(
+        return Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(
             AutoBuilder.pathfindToPoseFlipped(
                 Constants.AlignmentConstants.I_BLUE,
                 constraints,
@@ -124,7 +124,6 @@ public class Limelight extends SubsystemBase {
     }
     public Command setPathfindPose() {
         return Commands.runOnce(() -> {
-            var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
             switch ((int)tid.getDouble(0.0)) {
             case 18, 7:
                 targetPose = Constants.AlignmentConstants.A_BLUE;
@@ -152,7 +151,7 @@ public class Limelight extends SubsystemBase {
                 break;
             default:
                 System.out.println("I think there might be a problem.");
-                targetPose = llMeasurement.pose;
+                targetPose = drivetrain.getState().Pose;
                 break;
             }
         });
