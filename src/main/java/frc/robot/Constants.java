@@ -27,13 +27,17 @@ public final class Constants {
     // PID for motor A
     public static final double akS = 0.25, akV = 0.12, akA = 0.01, akP = 4.8, akI = 0, akD = 0.1;
     // Motion Magic Config A
-    public static final double ammCruiseVelocity = 80, ammAccel = 160, ammJerk = 1600;
+    public static final double ammCruiseVelocity = 80, ammAccel = 160, ammJerk = 1600; // (True)
 
     public static final int ElevatorMotorBID = 10;
     // PID for motor B
     public static final double bkS = 0.25, bkV = 0.12, bkA = 0.01, bkP = 4.8, bkI = 0, bkD = 0.1;
     // Motion Magic Config B
     public static final double bmmCruiseVelocity = 80, bmmAccel = 160, bmmJerk = 1600;
+  }
+
+  public static class EndEffectorConstants {
+    public static final int EndEffectorMotorID = 11;
   }
 
   public static class TagConstants {
