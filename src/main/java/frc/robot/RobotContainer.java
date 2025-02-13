@@ -23,6 +23,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
+import frc.robot.subsystems.FloorIntake;
 import frc.robot.subsystems.Limelight;
 
 public class RobotContainer {
@@ -46,6 +47,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     // public final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
     // public final EndEffector m_effector = new EndEffector();
+    public final FloorIntake m_floorIntake = new FloorIntake();
     public final Limelight limelight = new Limelight("limelight", drivetrain);
 
     /* Path follower */
@@ -87,8 +89,6 @@ public class RobotContainer {
             MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0).withPosition(0);
             talonFX.setControl(positionVoltage.withPosition(pos)); */
         
-        
-            
         Constants.OperatorConstants.driverController.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
@@ -125,6 +125,10 @@ public class RobotContainer {
         */
 
         // Constants.OperatorConstants.operatorController.a().onTrue(m_effector.runEffector());
+
+        Constants.OperatorConstants.driverController.x().onTrue(
+            m_floorIntake.powerLeftIntake(0.0).onlyIf(() -> m_floorIntake.leftDown).alongWith(
+            m_floorIntake.powerRightIntake(0.0).onlyIf(() -> m_floorIntake.rightDown)));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

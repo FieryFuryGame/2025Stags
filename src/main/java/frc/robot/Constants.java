@@ -27,7 +27,7 @@ public final class Constants {
     // PID for motor A
     public static final double akS = 0.25, akV = 0.12, akA = 0.01, akP = 4.8, akI = 0, akD = 0.1;
     // Motion Magic Config A
-    public static final double ammCruiseVelocity = 80, ammAccel = 160, ammJerk = 1600; // (True)
+    public static final double ammCruiseVelocity = 80, ammAccel = 160, ammJerk = 1600;
 
     public static final int ElevatorMotorBID = 10;
     // PID for motor B
@@ -45,6 +45,12 @@ public final class Constants {
     public static final int leftWheelsMotorID = 13;
     public static final int rightPivotMotorID = 14;
     public static final int rightWheelsMotorID = 15;
+
+    public static final double leftkS = 0.25, leftkV = 0.12, leftkA = 0.01, leftkP = 4.8, leftkI = 0, leftkD = 0.1;
+    public static final double rightkS = 0.25, rightkV = 0.12, rightkA = 0.01, rightkP = 4.8, rightkI = 0, rightkD = 0.1;
+
+    public static final double leftmmCruiseVelocity = 80, leftmmAccel = 160, leftmmJerk = 1600;
+    public static final double rightmmCruiseVelocity = 80, rightmmAccel = 160, rightmmJerk = 1600;
   }
 
   public static class TagConstants {
@@ -64,7 +70,6 @@ public final class Constants {
   }
 
   public static class AlignmentConstants {
-    // Corrected Pose2d values (same X and Y, updated rotation)
     public static final Pose2d A_BLUE = new Pose2d(3.1, 4.19, new Rotation2d(Math.toRadians(0)));
     public static final Pose2d A_RED = new Pose2d(14.381, 3.862, new Rotation2d(Math.toRadians(0)));
 
