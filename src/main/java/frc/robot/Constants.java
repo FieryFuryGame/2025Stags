@@ -40,6 +40,13 @@ public final class Constants {
     public static final int EndEffectorMotorID = 11;
   }
 
+  public static class FloorIntakeConstants {
+    public static final int leftPivotMotorID = 12;
+    public static final int leftWheelsMotorID = 13;
+    public static final int rightPivotMotorID = 14;
+    public static final int rightWheelsMotorID = 15;
+  }
+
   public static class TagConstants {
     public static final int Tag9Angle = 300;
     public static final int Tag8Angle = 240;

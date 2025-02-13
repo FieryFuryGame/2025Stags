@@ -22,6 +22,7 @@ import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Limelight;
 
 public class RobotContainer {
@@ -44,6 +45,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     // public final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+    // public final EndEffector m_effector = new EndEffector();
     public final Limelight limelight = new Limelight("limelight", drivetrain);
 
     /* Path follower */
@@ -121,6 +123,9 @@ public class RobotContainer {
         Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> m_elevator.setLevelThree()));
         Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> m_elevator.setLevelFour()));
         */
+
+        // Constants.OperatorConstants.operatorController.a().onTrue(m_effector.runEffector());
+
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
