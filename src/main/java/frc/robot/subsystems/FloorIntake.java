@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FloorIntakeConstants;
@@ -19,6 +20,9 @@ public class FloorIntake extends SubsystemBase {
     TalonFX rightPivot = new TalonFX(FloorIntakeConstants.rightPivotMotorID);
     TalonFX rightWheels = new TalonFX(FloorIntakeConstants.rightWheelsMotorID);
     public boolean rightDown = false;
+
+    DigitalInput beamBreakLeft = new DigitalInput(1);
+    DigitalInput beamBreakRight = new DigitalInput(2);
     
     public FloorIntake() {
         setMotorSettings();
@@ -94,14 +98,14 @@ public class FloorIntake extends SubsystemBase {
 
     public Command rightUp() {
         return runOnce(() -> {
-            rightPivot.setControl(positionVoltage.withPosition(leftPivot.getPosition().getValueAsDouble())); // Replace with up position
+            rightPivot.setControl(positionVoltage.withPosition(rightPivot.getPosition().getValueAsDouble())); // Replace with up position
             rightDown = false;
         });
     }
 
     public Command rightDown() {
         return runOnce(() -> {
-            rightPivot.setControl(positionVoltage.withPosition(leftPivot.getPosition().getValueAsDouble())); // Replace with down position
+            rightPivot.setControl(positionVoltage.withPosition(rightPivot.getPosition().getValueAsDouble())); // Replace with down position
             rightDown = true;
         });
     }
@@ -112,6 +116,24 @@ public class FloorIntake extends SubsystemBase {
 
     public Command powerRightIntake(double power) {
         return runOnce(() -> rightWheels.setVoltage(power));
+    }
+
+    public Command intake() {
+        return powerLeftIntake(0.0).onlyIf(() -> leftDown).alongWith(
+               powerRightIntake(0.0).onlyIf(() -> rightDown));
+    }
+
+    public Command eject() {
+        return powerLeftIntake(0.0).onlyIf(() -> !leftDown).alongWith(
+               powerRightIntake(0.0).onlyIf(() -> !rightDown));
+    }
+
+    public boolean floorLeftLoaded() {
+        return !beamBreakLeft.get();
+    }
+
+    public boolean floorRightLoaded() {
+        return !beamBreakRight.get();
     }
 
 

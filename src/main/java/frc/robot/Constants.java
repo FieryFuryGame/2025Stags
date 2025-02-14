@@ -53,6 +53,10 @@ public final class Constants {
     public static final double rightmmCruiseVelocity = 80, rightmmAccel = 160, rightmmJerk = 1600;
   }
 
+  public static class DeepCageConstants {
+    public static final int deepCageMotorID = 16;
+  }
+
   public static class TagConstants {
     public static final int Tag9Angle = 300;
     public static final int Tag8Angle = 240;

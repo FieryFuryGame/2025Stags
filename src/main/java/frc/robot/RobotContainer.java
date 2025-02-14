@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.generated.TunerConstants;
@@ -126,9 +127,18 @@ public class RobotContainer {
 
         // Constants.OperatorConstants.operatorController.a().onTrue(m_effector.runEffector());
 
-        Constants.OperatorConstants.driverController.x().onTrue(
-            m_floorIntake.powerLeftIntake(0.0).onlyIf(() -> m_floorIntake.leftDown).alongWith(
-            m_floorIntake.powerRightIntake(0.0).onlyIf(() -> m_floorIntake.rightDown)));
+        // Constants.OperatorConstants.operatorController.leftBumper().onTrue(m_floorIntake.leftToggle());
+        // Constants.OperatorConstants.operatorController.rightBumper().onTrue(m_floorIntake.rightToggle());
+        
+        /*
+        Constants.OperatorConstants.operatorController.x().onTrue(m_floorIntake.intake().until(() -> m_floorIntake.floorLeftLoaded() || m_floorIntake.floorRightLoaded()).andThen(
+            m_floorIntake.powerLeftIntake(0.0).alongWith(m_floorIntake.powerRightIntake(0.0))
+        ));
+
+        Constants.OperatorConstants.operatorController.y().onTrue(m_floorIntake.eject().andThen(new WaitCommand(0.5))
+            .andThen(m_floorIntake.powerLeftIntake(0.0).alongWith(m_floorIntake.powerRightIntake(0.0))));
+         */
+        
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
