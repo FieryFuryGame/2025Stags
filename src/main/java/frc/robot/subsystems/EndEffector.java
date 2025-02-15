@@ -32,4 +32,5 @@ public class EndEffector extends SubsystemBase {
             return setVoltage(0.0).until(() -> isCoralLoaded()).andThen(new WaitCommand(0.0)).andThen(setVoltage(0.0));
         }
     }
+    
 }

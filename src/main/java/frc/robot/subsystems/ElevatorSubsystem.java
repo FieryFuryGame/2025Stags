@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -81,6 +82,12 @@ public class ElevatorSubsystem extends SubsystemBase {
             elevatorMotorA.setVoltage(power);
             elevatorMotorB.setVoltage(power);
         });
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.getNumber("elevatorMotorAPos", elevatorMotorA.getPosition().getValueAsDouble());
+        SmartDashboard.getNumber("elevatorMotorBPos", elevatorMotorB.getPosition().getValueAsDouble());
     }
     
 

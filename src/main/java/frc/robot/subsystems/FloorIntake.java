@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FloorIntakeConstants;
@@ -135,6 +136,10 @@ public class FloorIntake extends SubsystemBase {
     public boolean floorRightLoaded() {
         return !beamBreakRight.get();
     }
-
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("leftIntakePos", leftPivot.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("rightIntakePos", rightPivot.getPosition().getValueAsDouble());
+    }
 
 }
