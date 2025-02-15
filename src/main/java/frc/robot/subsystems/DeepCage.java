@@ -21,8 +21,9 @@ public class DeepCage extends SubsystemBase {
         return runOnce(() -> deepCageMotor.setVoltage(power));
     }
 
-    public Command moveWithLimit() {
-
+    public Command moveWithLimit(double power) {
+        return runOnce(() -> deepCageMotor.setVoltage(power)).onlyIf(() -> deepCageMotor.getPosition().getValueAsDouble() <= 0.0 && deepCageMotor.getPosition().getValueAsDouble() >= 0.0)
+        .andThen(() -> deepCageMotor.setVoltage(0.0)).onlyIf(() -> deepCageMotor.getPosition().getValueAsDouble() <= 0.0 || deepCageMotor.getPosition().getValueAsDouble() >= 0.0);
     }
 
     public Command activateMotionMagic() {

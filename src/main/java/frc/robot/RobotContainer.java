@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.DeepCage;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.FloorIntake;
@@ -48,7 +49,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     // public final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
     // public final EndEffector m_effector = new EndEffector();
-    public final FloorIntake m_floorIntake = new FloorIntake();
+    // public final FloorIntake m_floorIntake = new FloorIntake();
+    // public final DeepCage m_deepCage = new DeepCage();
     public final Limelight limelight = new Limelight("limelight", drivetrain);
 
     /* Path follower */
@@ -138,6 +140,9 @@ public class RobotContainer {
         Constants.OperatorConstants.operatorController.y().onTrue(m_floorIntake.eject().andThen(new WaitCommand(0.5))
             .andThen(m_floorIntake.powerLeftIntake(0.0).alongWith(m_floorIntake.powerRightIntake(0.0))));
          */
+
+        // Constants.OperatorConstants.driverController.leftTrigger().whileTrue(m_deepCage.move(0.0)).onFalse(m_deepCage.move(0.0));
+        // Constants.OperatorConstants.driverController.rightTrigger().whileTrue(m_deepCage.move(0.0)).onFalse(m_deepCage.move(0.0));
         
 
         drivetrain.registerTelemetry(logger::telemeterize);

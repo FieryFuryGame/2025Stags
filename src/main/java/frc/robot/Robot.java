@@ -28,13 +28,13 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-    alert = new Alert("Loading Motivational Speech Framework...", AlertType.kInfo);
+    alert = new Alert("Loading Motivation-ish Framework...", AlertType.kInfo);
     alert.set(true);
   }
 
   public void motivationalQuotes() {
     Random random = new Random();
-    int choice = random.nextInt(38) + 1;
+    int choice = random.nextInt(60) + 1;
     switch (choice) {
       case 1:
         alert.setText("You can do it!");
@@ -150,6 +150,62 @@ public class Robot extends TimedRobot {
       case 38:
         alert.setText("Don't give up!");
         break;
+      case 39:
+        alert.setText("FEAR THE DEER!!!");
+        break;
+      case 40:
+        alert.setText("This is a message supplying support for you to win this match by gaining more points than another team during this match. And therefore, you are motivated. Hooray.");
+        break;
+      case 41:
+        alert.setText("You will win, and then there will be cake.");
+        break;
+      case 42:
+        alert.setText("Keep calm and place coral");
+        break;
+      case 43:
+        alert.setText("We have been trying to contact you about your car's extended warranty.");
+        break;
+      case 44:
+        alert.setText("There is no try, only do™");
+        break;
+        case 45:
+        alert.setText("Charley picked up the controller.");
+        break;
+      case 46:
+        alert.setText("System.out.println(\"You're doing great!\")");
+        break;
+      case 47:
+        alert.setText("01001101 01101111 01110100 01101001 01110110 01100001 01110100 01101001 01101111 01101110 00101110");
+        break;
+      case 48:
+        alert.setText("Let's go STAGS! Let's go!");
+        break;
+      case 49:
+        alert.setText("Made with 0% recycled minerals");
+        break;
+      case 50:
+        alert.setText("3. 2. 1. Reefscape!");
+        break;
+      case 51:
+        alert.setText("(Don't tell Charley)");
+        break;
+      case 52:
+        alert.setText("Safety glasses!");
+        break;
+      case 53:
+        alert.setText("alert.setText(\"\");");
+        break;
+      case 54:
+        alert.setText("I used the code to delete the code.");
+        break;
+      case 55:
+        alert.setText("Charley looked at the three in confusion, as they laughed about their silly joke. This is the joke.");
+        break;
+      case 56:
+        alert.setText("!yelrahC llet t'noD");
+        break;
+      case 57:
+        alert.setText("[Robot] wants to know your location");
     }
   }
 
