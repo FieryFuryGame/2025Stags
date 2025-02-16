@@ -4,10 +4,15 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.util.List;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
@@ -56,6 +61,7 @@ public class Limelight extends SubsystemBase {
     public int rotateDirection = 0;
     int tagAngle;
     Pose2d targetPose;
+    List<Waypoint> waypoints;
 
     InterpolatingDoubleTreeMap areaMap = new InterpolatingDoubleTreeMap();
 
@@ -109,7 +115,24 @@ public class Limelight extends SubsystemBase {
         0.5, 0.2,
         Units.degreesToRadians(540), Units.degreesToRadians(720));
 
-    
+    public List<Waypoint> createWaypoints() {
+        return PathPlannerPath.waypointsFromPoses(
+            drivetrain.getState().Pose,
+            targetPose
+        );
+    }
+
+    public PathPlannerPath generatePath() {
+        return new PathPlannerPath(
+            createWaypoints(), 
+            constraints, 
+            null, 
+            new GoalEndState(0.0, targetPose.getRotation()));
+    }
+
+    public Command runPath() {
+        return AutoBuilder.followPath(generatePath());
+    }
 
     public Command pathfind() {
         // Since AutoBuilder is configured, we can use it to build pathfinding commands

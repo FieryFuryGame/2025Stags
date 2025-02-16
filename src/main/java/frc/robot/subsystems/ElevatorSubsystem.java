@@ -1,10 +1,12 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,6 +22,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         setMotorSettings();
     }
     public void setMotorSettings() {
+
+        MotorOutputConfigs invert = new MotorOutputConfigs();
+        invert.Inverted = InvertedValue.Clockwise_Positive;
 
         // Settings For Motor A
         TalonFXConfiguration motorAConfig = new TalonFXConfiguration();
@@ -46,6 +51,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         motorBSlot.kP = Constants.ElevatorConstants.bkP;
         motorBSlot.kI = Constants.ElevatorConstants.bkI;
         motorBSlot.kD = Constants.ElevatorConstants.bkD;
+        elevatorMotorB.getConfigurator().apply(invert);
+        
 
         MotionMagicConfigs mmBConfig = motorBConfig.MotionMagic;
         mmBConfig.MotionMagicCruiseVelocity = Constants.ElevatorConstants.bmmCruiseVelocity;

@@ -34,10 +34,11 @@ public class Robot extends TimedRobot {
 
   public void motivationalQuotes() {
     Random random = new Random();
-    int choice = random.nextInt(60) + 1;
+    int choice = random.nextInt(83) + 1;
     switch (choice) {
       case 1:
         alert.setText("You can do it!");
+        // A missing semi-colon
         break;
       case 2:
         alert.setText("Loading message failed: [click to view error]");
@@ -55,7 +56,7 @@ public class Robot extends TimedRobot {
         alert.setText("Are you even reading these?");
         break;
       case 7:
-        alert.setText("Nice!");
+        alert.setText("Nice, but less important");
         break;
       case 8:
         alert.setText("It's not your fault.");
@@ -199,13 +200,95 @@ public class Robot extends TimedRobot {
         alert.setText("I used the code to delete the code.");
         break;
       case 55:
-        alert.setText("Charley looked at the three in confusion, as they laughed about their silly joke. This is the joke.");
+        alert.setText("Charley looked at the text in confusion, as the programmers laughed about their silly joke. This is the joke.");
         break;
       case 56:
         alert.setText("!yelrahC llet t'noD");
         break;
       case 57:
         alert.setText("[Robot] wants to know your location");
+        break;
+      case 58:
+        alert.setText("The fitness gram pacer test is a multi-stage aerobics test that gets progressively harder each stage.");
+        break;
+      case 59:
+        alert.setText("What are you doing in my swamp!");
+        break;
+      case 100:
+        alert.setText("This message exists, but will never be seen. Isn't that weird?");
+        break;
+      case 60:
+        alert.setText("Robot abuse");
+        break;
+      case 61:
+        alert.setText("99% of drivers lose a match before they place coral. Not you.");
+        break;
+      case 62:
+        alert.setText("Got milk?");
+        break;
+      case 63:
+        alert.setText("FEED THE DEER!!");
+        break;
+      case 64:
+        alert.setText("The code died. Sorry.");
+        break;
+      case 65:
+        alert.setText("Roses are red, violets are blue. There is a semi-colon missing, on line 42.");
+        break;
+      case 66:
+        alert.setText("If aliens invade earth, show them this message. Hi.");
+        break;
+      case 67:
+        alert.setText("Totally Legal™");
+        break;
+      case 68:
+        alert.setText("When every robot is going left, go right.");
+        break;
+      case 69:
+        alert.setText("Nice, but more important");
+        break;
+      case 70:
+        alert.setText("Programming 2: Electric Boogaloo");
+        break;
+      case 71:
+        alert.setText("The attack was super effective!");
+        break;
+      case 72:
+        alert.setText("Finish him");
+        break;
+      case 73:
+        alert.setText("What would FIRST think of this?");
+        break;
+      case 74:
+        alert.setText("Someone should write a research paper about this text box.");
+        break;
+      case 75:
+        alert.setText("Do you like chemistry jokes? Actually, I was going to tell one about Sodium and Hydrogen. But Na.");
+        break;
+      case 76:
+        alert.setText("§§§§§§§e§§");
+        break;
+      case 77:
+        alert.setText("Also try FTC!");
+        break;
+      case 78:
+        alert.setText("Woodie never dies!");
+        break;
+      case 79:
+        alert.setText("Long live the king!");
+        break;
+      case 80:
+        alert.setText("Jonas left the game.");
+        break;
+      case 81:
+        alert.setText("Was Jonas here?");
+        break;
+      case 82:
+        alert.setText("May contain switch statements");
+        break;
+      case 83:
+        alert.setText("Collapse the children! (This is fine in context lol)");
+        break;
     }
   }
 
