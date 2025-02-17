@@ -4,15 +4,11 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import java.util.List;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
@@ -24,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -53,7 +50,7 @@ public class Limelight extends SubsystemBase {
     NetworkTableEntry tx;
     NetworkTableEntry ty;
     NetworkTableEntry ta;
-    NetworkTableEntry tid;
+    public NetworkTableEntry tid;
     PoseEstimate visionPoseEstimate;
     double ThreeDRotationMeasurement;
     double ThreeDDistanceMeasurement;
@@ -61,7 +58,7 @@ public class Limelight extends SubsystemBase {
     public int rotateDirection = 0;
     int tagAngle;
     Pose2d targetPose;
-    List<Waypoint> waypoints;
+    PathPlannerPath alignmentPath;
 
     InterpolatingDoubleTreeMap areaMap = new InterpolatingDoubleTreeMap();
 
@@ -77,6 +74,14 @@ public class Limelight extends SubsystemBase {
         areaMap.put(0.98, 65.625);
         areaMap.put(0.64, 81.3125);
         areaMap.put(0.3, 114.125);
+    }
+
+    public void setPath(int tag, String trigger) {
+        try{
+            alignmentPath = PathPlannerPath.fromPathFile(tag + trigger);
+        } catch (Exception e) {
+            DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+        }
     }
 
     public Limelight(String limelightName, CommandSwerveDrivetrain swerve) {
@@ -115,69 +120,53 @@ public class Limelight extends SubsystemBase {
         0.5, 0.2,
         Units.degreesToRadians(540), Units.degreesToRadians(720));
 
-    public List<Waypoint> createWaypoints() {
-        return PathPlannerPath.waypointsFromPoses(
-            drivetrain.getState().Pose,
-            targetPose
-        );
+    public Command pathfindWithPathLeft() {
+        return AutoBuilder.pathfindThenFollowPath(alignmentPath, constraints);
     }
 
-    public PathPlannerPath generatePath() {
-        return new PathPlannerPath(
-            createWaypoints(), 
-            constraints, 
-            null, 
-            new GoalEndState(0.0, targetPose.getRotation()));
-    }
-
-    public Command runPath() {
-        return AutoBuilder.followPath(generatePath());
+    public Command pathfindWithPathRight() {
+        return AutoBuilder.pathfindThenFollowPath(setPathRight(), constraints);
     }
 
     public Command pathfind() {
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
         return Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(
             AutoBuilder.pathfindToPoseFlipped(
-                Constants.AlignmentConstants.I_BLUE,
+                targetPose,
                 constraints,
                 0.0 // Goal end velocity in meters/sec
             )
         );
     }
-    public Command setPathfindPose() {
-        return Commands.runOnce(() -> {
-            switch ((int)tid.getDouble(0.0)) {
+
+    public PathPlannerPath setPathRight() {
+        switch ((int) tid.getDouble(0.0)) {
             case 18, 7:
                 targetPose = Constants.AlignmentConstants.A_BLUE;
-                System.out.println("A");
+                System.out.println("7/18");
                 break;
             case 19, 6:
                 targetPose = Constants.AlignmentConstants.K_BLUE;
-                System.out.println("B");
+                System.out.println("6/19");
                 break;
             case 20,  11:
                 targetPose = Constants.AlignmentConstants.I_BLUE;
-                System.out.println("C");
+                System.out.println("11/20");
                 break;
             case 21, 10:
                 targetPose = Constants.AlignmentConstants.G_BLUE;
-                System.out.println("D");
+                System.out.println("10/21");
                 break;
             case 22, 9:
                 targetPose = Constants.AlignmentConstants.E_BLUE;
-                System.out.println("E");
+                System.out.println("9/22");
                 break;
             case 17, 8:
                 targetPose = Constants.AlignmentConstants.C_BLUE;
-                System.out.println("F");
-                break;
-            default:
-                System.out.println("I think there might be a problem.");
-                targetPose = drivetrain.getState().Pose;
+                System.out.println("8/17");
                 break;
             }
-        });
-            
+        return null;
     }
 
     @Override
@@ -194,6 +183,5 @@ public class Limelight extends SubsystemBase {
         SmartDashboard.putNumber("tr", MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0,360));
         SmartDashboard.putNumber("td", areaMap.get(ta.getDouble(0.0))); // Target Distance
 
-        
     }
 }

@@ -109,7 +109,7 @@ public class RobotContainer {
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
-        Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight").pose)).andThen(limelight.setPathfindPose()).andThen(limelight.pathfind()));
+        Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight").pose)).andThen(Commands.runOnce(() -> limelight.setPath(1, "Left"))).andThen(limelight.pathfind()).unless(() -> (int) limelight.tid.getDouble(0.0) <= 0));
         Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
             System.out.println(AutoBuilder.getCurrentPose());
         }));
