@@ -263,7 +263,7 @@ public class Robot extends TimedRobot {
         alert.setText("Someone should write a research paper about this text box.");
         break;
       case 75:
-        alert.setText("Do you like chemistry jokes? Actually, I was going to tell one about Sodium and Hydrogen. But NaH.");
+        alert.setText("Do you like chemistry jokes? Actually, I was going to tell one about Sodium and Hydrogen. But Na.");
         break;
       case 76:
         alert.setText("§§§§§§§e§§");
