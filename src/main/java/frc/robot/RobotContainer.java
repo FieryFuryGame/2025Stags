@@ -92,15 +92,6 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Constants.OperatorConstants.driverController.getLeftY(), -Constants.OperatorConstants.driverController.getLeftX()))
         ));
-
-        
-        // Control Once Both Vision And Swerve Work
-        // Constants.OperatorConstants.driverController.povUp().whileTrue(Commands.run(() -> limelight.functionName(), limelight));
-        
-        /*  TalonFX talonFX = new TalonFX(0);
-            double pos = talonFX.getPosition().getValueAsDouble();
-            MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0).withPosition(0);
-            talonFX.setControl(positionVoltage.withPosition(pos)); */
         
         Constants.OperatorConstants.driverController.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
@@ -109,7 +100,8 @@ public class RobotContainer {
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
-        Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight").pose)).andThen(limelight.setPathfindPose()).andThen(limelight.pathfind()));
+        Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight").pose)).andThen(limelight.setPathfindPose()).andThen(limelight.pathfind())); // Legacy Control
+        // Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> limelight.getPathToTag("left")).unless(() -> limelight.tid.getDouble(0.0) <= 0).andThen(limelight.pathfindWithPath()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
         Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
             System.out.println(AutoBuilder.getCurrentPose());
         }));

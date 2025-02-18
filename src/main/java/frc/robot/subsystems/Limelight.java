@@ -24,6 +24,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -53,7 +54,7 @@ public class Limelight extends SubsystemBase {
     NetworkTableEntry tx;
     NetworkTableEntry ty;
     NetworkTableEntry ta;
-    NetworkTableEntry tid;
+    public NetworkTableEntry tid;
     PoseEstimate visionPoseEstimate;
     double ThreeDRotationMeasurement;
     double ThreeDDistanceMeasurement;
@@ -62,6 +63,7 @@ public class Limelight extends SubsystemBase {
     int tagAngle;
     Pose2d targetPose;
     List<Waypoint> waypoints;
+    PathPlannerPath alignmentPath;
 
     InterpolatingDoubleTreeMap areaMap = new InterpolatingDoubleTreeMap();
 
@@ -115,23 +117,20 @@ public class Limelight extends SubsystemBase {
         0.5, 0.2,
         Units.degreesToRadians(540), Units.degreesToRadians(720));
 
-    public List<Waypoint> createWaypoints() {
-        return PathPlannerPath.waypointsFromPoses(
-            drivetrain.getState().Pose,
-            targetPose
+    public void getPathToTag(String trigger) { // Uses the tag id and the name to find the path file we've created.
+        try{
+            alignmentPath = PathPlannerPath.fromPathFile((int) tid.getDouble(0.0) + trigger);
+            alignmentPath.preventFlipping = false;
+
+        } catch (Exception e) {
+            DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+        }
+    }
+
+    public Command pathfindWithPath() { // Pathfinds to the start of the path, then aligns with the path.
+        return Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(
+            AutoBuilder.pathfindThenFollowPath(alignmentPath, constraints)
         );
-    }
-
-    public PathPlannerPath generatePath() {
-        return new PathPlannerPath(
-            createWaypoints(), 
-            constraints, 
-            null, 
-            new GoalEndState(0.0, targetPose.getRotation()));
-    }
-
-    public Command runPath() {
-        return AutoBuilder.followPath(generatePath());
     }
 
     public Command pathfind() {

@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
     alert.set(true);
   }
 
-  public void motivationalQuotes() {
+  public void motivationalQuotes() { // Joke we are doing for the drivers during testing.
     Random random = new Random();
     int choice = random.nextInt(83) + 1;
     switch (choice) {
@@ -167,127 +167,124 @@ public class Robot extends TimedRobot {
         alert.setText("We have been trying to contact you about your car's extended warranty.");
         break;
       case 44:
-        alert.setText("There is no try, only do™");
+        alert.setText("Charley enabled the robot.");
         break;
-        case 45:
-        alert.setText("Charley picked up the controller.");
-        break;
-      case 46:
+      case 45:
         alert.setText("System.out.println(\"You're doing great!\")");
         break;
-      case 47:
+      case 46:
         alert.setText("01001101 01101111 01110100 01101001 01110110 01100001 01110100 01101001 01101111 01101110 00101110");
         break;
-      case 48:
+      case 47:
         alert.setText("Let's go STAGS! Let's go!");
         break;
-      case 49:
+      case 48:
         alert.setText("Made with 0% recycled minerals");
         break;
-      case 50:
+      case 49:
         alert.setText("3. 2. 1. Reefscape!");
         break;
-      case 51:
+      case 50:
         alert.setText("(Don't tell Charley)");
         break;
-      case 52:
+      case 51:
         alert.setText("Safety glasses!");
         break;
-      case 53:
+      case 52:
         alert.setText("alert.setText(\"\");");
         break;
-      case 54:
+      case 53:
         alert.setText("I used the code to delete the code.");
         break;
-      case 55:
+      case 54:
         alert.setText("Charley looked at the text in confusion, as the programmers laughed about their silly joke. This is the joke.");
         break;
-      case 56:
+      case 55:
         alert.setText("!yelrahC llet t'noD");
         break;
-      case 57:
+      case 56:
         alert.setText("[Robot] wants to know your location");
         break;
-      case 58:
+      case 57:
         alert.setText("The fitness gram pacer test is a multi-stage aerobics test that gets progressively harder each stage.");
         break;
-      case 59:
+      case 58:
         alert.setText("What are you doing in my swamp!");
         break;
       case 100:
         alert.setText("This message exists, but will never be seen. Isn't that weird?");
         break;
-      case 60:
-        alert.setText("Robot abuse");
+      case 59:
+        alert.setText("Either you run the robot, or the robot runs you.");
         break;
-      case 61:
+      case 60:
         alert.setText("99% of drivers lose a match before they place coral. Not you.");
         break;
+      case 61:
+        alert.setText("minecraft/assets/textures/model/lightly_waxed_weathered_cut_copper_stairs.json");
+        break;
       case 62:
-        alert.setText("Got milk?");
-        break;
-      case 63:
-        alert.setText("FEED THE DEER!!");
-        break;
-      case 64:
         alert.setText("The code died. Sorry.");
         break;
-      case 65:
+      case 63:
         alert.setText("Roses are red, violets are blue. There is a semi-colon missing, on line 42.");
         break;
-      case 66:
+      case 64:
         alert.setText("If aliens invade earth, show them this message. Hi.");
         break;
-      case 67:
+      case 65:
         alert.setText("Totally Legal™");
         break;
-      case 68:
+      case 66:
         alert.setText("When every robot is going left, go right.");
         break;
-      case 69:
+      case 67:
         alert.setText("Nice, but more important");
         break;
-      case 70:
+      case 68:
         alert.setText("Programming 2: Electric Boogaloo");
         break;
-      case 71:
+      case 69:
         alert.setText("The attack was super effective!");
         break;
-      case 72:
+      case 70:
         alert.setText("Finish him");
         break;
-      case 73:
+      case 71:
         alert.setText("What would FIRST think of this?");
         break;
-      case 74:
+      case 72:
         alert.setText("Someone should write a research paper about this text box.");
         break;
+      case 73:
+        alert.setText("Do you like chemistry jokes? Actually, I was going to tell one about Sodium and Hydrogen. But NaH.");
+        break;
+      case 74:
+        alert.setText("Yes, of course there's a point to this!");
+        break;
       case 75:
-        alert.setText("Do you like chemistry jokes? Actually, I was going to tell one about Sodium and Hydrogen. But Na.");
-        break;
-      case 76:
-        alert.setText("§§§§§§§e§§");
-        break;
-      case 77:
         alert.setText("Also try FTC!");
         break;
-      case 78:
-        alert.setText("Woodie never dies!");
-        break;
-      case 79:
+      case 76:
         alert.setText("Long live the king!");
         break;
-      case 80:
-        alert.setText("Jonas left the game.");
+      case 77:
+        alert.setText("Jonas joined the game.");
         break;
-      case 81:
+      case 78:
         alert.setText("Was Jonas here?");
         break;
-      case 82:
+      case 79:
         alert.setText("May contain switch statements");
         break;
-      case 83:
+      case 80:
         alert.setText("Collapse the children! (This is fine in context lol)");
+        break;
+      case 81:
+        alert.setText("This message was not written on April 78th, -20068 CE, at 25:76 RM");
+        break;
+      case 82:
+        alert.setText("Ctrl + S");
         break;
     }
   }
