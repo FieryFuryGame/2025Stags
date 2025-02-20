@@ -48,7 +48,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    // public final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+    public final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
     // public final EndEffector m_effector = new EndEffector();
     // public final FloorIntake m_floorIntake = new FloorIntake();
     // public final DeepCage m_deepCage = new DeepCage();
@@ -100,9 +100,9 @@ public class RobotContainer {
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
-        Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight").pose)).andThen(limelight.setPathfindPose()).andThen(limelight.pathfind())); // Legacy Control
-        // Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> limelight.getPathToTag("left")).unless(() -> limelight.tid.getDouble(0.0) <= 0).andThen(limelight.pathfindWithPath()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
-        Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
+        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight").pose)).andThen(limelight.setPathfindPose()).andThen(limelight.pathfind())); // Legacy Control
+        // Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.getPathToTag("left")).unless(() -> limelight.tid.getDouble(0.0) <= 0).andThen(limelight.pathfindWithPath()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> {
             System.out.println(AutoBuilder.getCurrentPose());
         }));
 
@@ -114,15 +114,15 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.start().and(Constants.OperatorConstants.driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        /*
-        Constants.OperatorConstants.operatorController.leftBumper()
+        Constants.OperatorConstants.driverController.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        
+        Constants.OperatorConstants.operatorController.leftTrigger()
             .whileTrue(m_elevator.setVoltage(0.05))
             .onFalse(m_elevator.setVoltage(0));
-        Constants.OperatorConstants.operatorController.rightBumper()
+        Constants.OperatorConstants.operatorController.rightTrigger()
             .whileTrue(m_elevator.setVoltage(-0.05))
             .onFalse(m_elevator.setVoltage(0));
-
+        /*
         Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> m_elevator.setLevelOne()));
         Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> m_elevator.setLevelTwo()));
         Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> m_elevator.setLevelThree()));
@@ -145,6 +145,9 @@ public class RobotContainer {
 
         // Constants.OperatorConstants.driverController.leftTrigger().whileTrue(m_deepCage.move(0.0)).onFalse(m_deepCage.move(0.0));
         // Constants.OperatorConstants.driverController.rightTrigger().whileTrue(m_deepCage.move(0.0)).onFalse(m_deepCage.move(0.0));
+
+        // Constants.OperatorConstants.driverController.leftTrigger().whileTrue(m_deepCage.moveWithLimitUp(0.0)).onFalse(m_deepCage.move(0.0));
+        // Constants.OperatorConstants.driverController.rightTrigger().whileTrue(m_deepCage.moveWithLimitDown(0.0)).onFalse(m_deepCage.move(0.0));
         
 
         drivetrain.registerTelemetry(logger::telemeterize);

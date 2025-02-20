@@ -18,16 +18,26 @@ public class DeepCage extends SubsystemBase {
 
     }
 
-    public Command move(double power) {
+    public Command move(double power) { // Has no limit, which means it is just for testing the deep cage, and finding positions to lock to.
         return runOnce(() -> deepCageMotor.setVoltage(power));
     }
 
-    public Command moveWithLimit(double power) {
+    public Command moveWithLimit(double power) { // Will likely get stuck if outside of the range for even a second.
         return runOnce(() -> deepCageMotor.setVoltage(power)).onlyIf(() -> deepCageMotor.getPosition().getValueAsDouble() <= 0.0 && deepCageMotor.getPosition().getValueAsDouble() >= 0.0)
         .andThen(() -> deepCageMotor.setVoltage(0.0)).onlyIf(() -> deepCageMotor.getPosition().getValueAsDouble() <= 0.0 || deepCageMotor.getPosition().getValueAsDouble() >= 0.0);
     }
 
-    public Command activateMotionMagic() {
+    public Command moveWithLimitUp(double power) { // Using this won't let the deep cage reach an upper limit.
+        return runOnce(() -> deepCageMotor.setVoltage(power)).onlyIf(() -> deepCageMotor.getPosition().getValueAsDouble() <= 0.0)
+        .andThen(() -> deepCageMotor.setVoltage(0.0)).onlyIf(() -> deepCageMotor.getPosition().getValueAsDouble() > 0.0);
+    }
+
+    public Command moveWithLimitDown(double power) { // Using this won't let the deep cage reach a lower limit.
+        return runOnce(() -> deepCageMotor.setVoltage(power)).onlyIf(() -> deepCageMotor.getPosition().getValueAsDouble() >= 0.0)
+        .andThen(() -> deepCageMotor.setVoltage(0.0)).onlyIf(() -> deepCageMotor.getPosition().getValueAsDouble() < 0.0);
+    }
+
+    public Command activateMotionMagic() { // I don't believe this is supposed to be used at any point.
         return runOnce(() -> deepCageMotor.setControl(positionVoltage.withPosition(deepCageMotor.getPosition().getValueAsDouble())));
     }
 
