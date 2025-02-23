@@ -10,24 +10,34 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
+import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.DeepCage;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.EndEffector;
+import frc.robot.subsystems.FloorIntake;
 import frc.robot.subsystems.Limelight;
 
 public class RobotContainer {
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
+    PoseEstimate llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -41,13 +51,25 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    // public final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+    public final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+    // public final EndEffector m_effector = new EndEffector();
+    // public final FloorIntake m_floorIntake = new FloorIntake();
+    // public final DeepCage m_deepCage = new DeepCage();
     public final Limelight limelight = new Limelight("limelight", drivetrain);
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+        /*
+        NamedCommands.registerCommand("L1", Commands.runOnce(() -> m_elevator.setLevelOne()));
+        NamedCommands.registerCommand("L2", Commands.runOnce(() -> m_elevator.setLevelTwo()));
+        NamedCommands.registerCommand("L3", Commands.runOnce(() -> m_elevator.setLevelThree()));
+        NamedCommands.registerCommand("L4", Commands.runOnce(() -> m_elevator.setLevelFour()));
+        
+        NamedCommands.registerCommand("dispenseCoral", m_effector.runEffector());
+        */
+
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -60,31 +82,18 @@ public class RobotContainer {
 
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
-            
-
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getRightX(), 0.07) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getRightX(), 0.08) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
-        Constants.OperatorConstants.driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        Constants.OperatorConstants.driverController.x().whileTrue(drivetrain.applyRequest(() -> brake));
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Constants.OperatorConstants.driverController.getLeftY(), -Constants.OperatorConstants.driverController.getLeftX()))
         ));
-
         
-        // Control Once Both Vision And Swerve Work
-        // Constants.OperatorConstants.driverController.povUp().whileTrue(Commands.run(() -> limelight.functionName(), limelight));
-        
-        /*  TalonFX talonFX = new TalonFX(0);
-            double pos = talonFX.getPosition().getValueAsDouble();
-            MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0).withPosition(0);
-            talonFX.setControl(positionVoltage.withPosition(pos)); */
-        
-        
-            
         Constants.OperatorConstants.driverController.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
@@ -92,14 +101,12 @@ public class RobotContainer {
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
-        Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> {   
-            limelight.getTagAngle();
-            limelight.rotateDirection = limelight.decideRotationDirection();})
-            .andThen(limelight.rotateToTag()));
-        Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> {   
-            limelight.getTagAngle();
-            limelight.rotateDirection = limelight.decideRotationDirection();})
-            .andThen(limelight.rotateToTag()));
+        //Constants.OperatorConstants.driverController.leftBumper().onTrue(limelight.setPathfindPose().andThen(limelight.pathfind())); // Legacy Control
+        //Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.getPathToTag("Left")).unless(() -> limelight.tid.getDouble(0.0) <= 0).andThen(limelight.pathfindWithPath()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        //Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(limelight.pathfindWithPath("Left")));
+        //Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(limelight.pathfindWithPath("Right")).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        //Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(limelight.pathfindWithPath("Center")).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -109,20 +116,42 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.start().and(Constants.OperatorConstants.driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        Constants.OperatorConstants.driverController.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        
+        Constants.OperatorConstants.operatorController.leftTrigger()
+            .whileTrue(m_elevator.setVoltage(6))
+            .onFalse(m_elevator.setVoltage(0));
+        Constants.OperatorConstants.operatorController.rightTrigger()
+            .whileTrue(m_elevator.setVoltage(-6))
+            .onFalse(m_elevator.setVoltage(0));
         /*
-        Constants.OperatorConstants.operatorController.leftBumper()
-            .whileTrue(m_elevator.setVoltage(0.05))
-            .onFalse(m_elevator.setVoltage(0));
-        Constants.OperatorConstants.operatorController.rightBumper()
-            .whileTrue(m_elevator.setVoltage(-0.05))
-            .onFalse(m_elevator.setVoltage(0));
-
-        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> m_elevator.setLevelOne()));
+        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> m_elevator.setLevelThree()));
         Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> m_elevator.setLevelTwo()));
-        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> m_elevator.setLevelThree()));
-        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> m_elevator.setLevelFour()));
+        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> m_elevator.setLevelFour()));
+        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> m_elevator.setLevelOne()));
         */
+
+        // Constants.OperatorConstants.operatorController.a().onTrue(m_effector.runEffector());
+
+        // Constants.OperatorConstants.operatorController.leftBumper().onTrue(m_floorIntake.leftToggle());
+        // Constants.OperatorConstants.operatorController.rightBumper().onTrue(m_floorIntake.rightToggle());
+        
+        /*
+        Constants.OperatorConstants.operatorController.x().onTrue(m_floorIntake.intake().until(() -> m_floorIntake.floorLeftLoaded() || m_floorIntake.floorRightLoaded()).andThen(
+            m_floorIntake.powerLeftIntake(0.0).alongWith(m_floorIntake.powerRightIntake(0.0))
+        ));
+
+        Constants.OperatorConstants.operatorController.y().onTrue(m_floorIntake.eject().andThen(new WaitCommand(0.5))
+            .andThen(m_floorIntake.powerLeftIntake(0.0).alongWith(m_floorIntake.powerRightIntake(0.0))));
+         */
+
+        // Constants.OperatorConstants.driverController.leftTrigger().whileTrue(m_deepCage.move(0.0)).onFalse(m_deepCage.move(0.0));
+        // Constants.OperatorConstants.driverController.rightTrigger().whileTrue(m_deepCage.move(0.0)).onFalse(m_deepCage.move(0.0));
+
+        // Constants.OperatorConstants.driverController.leftTrigger().whileTrue(m_deepCage.moveWithLimitUp(0.0)).onFalse(m_deepCage.move(0.0));
+        // Constants.OperatorConstants.driverController.rightTrigger().whileTrue(m_deepCage.moveWithLimitDown(0.0)).onFalse(m_deepCage.move(0.0));
+        
+
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 

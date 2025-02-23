@@ -4,19 +4,35 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.util.List;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.generated.TunerConstants;
 
 public class Limelight extends SubsystemBase {
@@ -35,16 +51,30 @@ public class Limelight extends SubsystemBase {
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon2;
     
-    int tv;
-    double tx;
-    double ty;
-    double ta;
-    int tid;
+    NetworkTableEntry tv;
+    NetworkTableEntry tx;
+    NetworkTableEntry ty;
+    NetworkTableEntry ta;
+    public NetworkTableEntry tid;
+    PoseEstimate visionPoseEstimate;
     double ThreeDRotationMeasurement;
     double ThreeDDistanceMeasurement;
     public int teamAdd = 0;
     public int rotateDirection = 0;
     int tagAngle;
+    Pose2d targetPose = new Pose2d();
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints = new PathConstraints(
+        4.0, 3.0,
+        Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+        new Pose2d(1.0, 1.0, Rotation2d.fromDegrees(0)),
+        new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
+        new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90))
+    );
+    PathPlannerPath alignmentPath = new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0.0, Rotation2d.fromDegrees(-90)));
 
     InterpolatingDoubleTreeMap areaMap = new InterpolatingDoubleTreeMap();
 
@@ -68,11 +98,12 @@ public class Limelight extends SubsystemBase {
         drivetrain = swerve;
         pigeon2 = drivetrain.getPigeon2();
         table = tableInstance.getTable(limelightName);
+        targetPose = drivetrain.getState().Pose;
     }
 
     public double getTargetDistanceMath() {
 
-        double targetOffsetAngle_Vertical = ty;
+        double targetOffsetAngle_Vertical = ty.getDouble(0.0);
 
         // how many degrees back is your limelight rotated from perfectly vertical?
         double limelightMountAngleDegrees = 0.343;
@@ -92,80 +123,85 @@ public class Limelight extends SubsystemBase {
         return distanceFromLimelightToGoalInches;
     }
 
-    public Command rotateToTag() {
-        return drivetrain.applyRequest(() ->
-            drive.withRotationalRate(0.3 * rotateDirection * MaxAngularRate)).unless(() -> tagAngle == -1)
-                .until(() -> MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0, 360) <= tagAngle + 2 && MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0, 360) > tagAngle - 2);
+    
+
+    public PathPlannerPath getPathToTag(String trigger) { // Uses the tag id and the name to find the path file we've created.
+        try{
+            PathPlannerPath path = PathPlannerPath.fromPathFile("21Center");
+            path.preventFlipping = false;
+            System.out.println("[Pathfinder] Pathfinding to the " + trigger + "of AprilTag!");
+            return path;
+
+        } catch (Exception e) {
+            DriverStation.reportError("[Pathfinder] Big oops: " + e.getMessage(), e.getStackTrace());
+            return alignmentPath;
+        }
     }
 
-    public void getTagAngle() {
-        switch (tid) {
-            case 6:
-                tagAngle = Constants.TagConstants.Tag6Angle;
+    public Command pathfindWithPath(String trigger) { // Pathfinds to the start of the path, then aligns with the path.
+        return AutoBuilder.pathfindThenFollowPath(getPathToTag(trigger), constraints);
+    }
+
+    public Command pathfind() {
+        // Since AutoBuilder is configured, we can use it to build pathfinding commands
+        return Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(
+            AutoBuilder.pathfindToPoseFlipped(
+                Constants.AlignmentConstants.I_BLUE,
+                constraints,
+                0.0 // Goal end velocity in meters/sec
+            )
+        );
+    }
+    public Command setPathfindPose() {
+        return Commands.runOnce(() -> {
+            switch ((int)tid.getDouble(0.0)) {
+            case 18, 7:
+                targetPose = Constants.AlignmentConstants.A_BLUE;
+                System.out.println("A");
                 break;
-            case 7:
-                tagAngle = Constants.TagConstants.Tag7Angle;
+            case 19, 6:
+                targetPose = Constants.AlignmentConstants.K_BLUE;
+                System.out.println("B");
                 break;
-            case 8:
-                tagAngle = Constants.TagConstants.Tag8Angle;
+            case 20,  11:
+                targetPose = Constants.AlignmentConstants.I_BLUE;
+                System.out.println("C");
                 break;
-            case 9:
-                tagAngle = Constants.TagConstants.Tag9Angle;
+            case 21, 10:
+                targetPose = Constants.AlignmentConstants.G_BLUE;
+                System.out.println("D");
                 break;
-            case 10:
-                tagAngle = Constants.TagConstants.Tag10Angle;
+            case 22, 9:
+                targetPose = Constants.AlignmentConstants.E_BLUE;
+                System.out.println("E");
                 break;
-            case 11:
-                tagAngle = Constants.TagConstants.Tag11Angle;
-                break;
-            case 17:
-                tagAngle = Constants.TagConstants.Tag17Angle;
-                break;
-            case 18:
-                tagAngle = Constants.TagConstants.Tag18Angle;
-                break;
-            case 19:
-                tagAngle = Constants.TagConstants.Tag19Angle;
-                break;
-            case 20:
-                tagAngle = Constants.TagConstants.Tag20Angle;
-                break;
-            case 21:
-                tagAngle = Constants.TagConstants.Tag21Angle;
-                break;
-            case 22:
-                tagAngle = Constants.TagConstants.Tag22Angle;
+            case 17, 8:
+                targetPose = Constants.AlignmentConstants.C_BLUE;
+                System.out.println("F");
                 break;
             default:
-                System.out.println("[Limelight] Incorrect tag!");
-                tagAngle = -1;
+                System.out.println("I think there might be a problem.");
+                targetPose = drivetrain.getState().Pose;
                 break;
-        }
-    }
-
-    public int decideRotationDirection() {
-        if (tx < 0) {
-            return 1;
-        } else {
-            return -1;
-        }
+            }
+        });
+            
     }
 
     @Override
     public void periodic() {
         LimelightHelpers.SetRobotOrientation(name, MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees(), 0, 360), 0, MathUtil.inputModulus(pigeon2.getPitch().getValueAsDouble(), 0, 360), 0, MathUtil.inputModulus(pigeon2.getRoll().getValueAsDouble(), 0, 360), 0);
         
-        tv = (int) table.getValue("tv").getDouble();
-        tx = table.getValue("tx").getDouble();
-        ty = table.getValue("ty").getDouble();
-        tid = (int) table.getValue("tid").getDouble();
-        ta = table.getValue("ta").getDouble();
-        ThreeDRotationMeasurement = table.getValue("botpose_orb_wpiblue").getDoubleArray()[5];
-        SmartDashboard.putNumber("llr", ThreeDRotationMeasurement);
-        ThreeDDistanceMeasurement = table.getValue("botpose_orb_wpiblue").getDoubleArray()[9];
-        SmartDashboard.putNumber("lld", ThreeDDistanceMeasurement);
+        tv = table.getEntry("tv");
+        tx = table.getEntry("tx");
+        ty = table.getEntry("ty");
+        tid = table.getEntry("tid");
+        ta = table.getEntry("ta");
+        visionPoseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         
         SmartDashboard.putNumber("tr", MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0,360));
-        SmartDashboard.putNumber("td", areaMap.get(ta)); // Target Distance
+        SmartDashboard.putNumber("td", areaMap.get(ta.getDouble(0.0))); // Target Distance
+
+        
     }
 }

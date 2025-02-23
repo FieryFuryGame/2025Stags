@@ -6,19 +6,24 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ElevatorSubsystem extends SubsystemBase {
     
-    TalonFX elevatorMotorA = new TalonFX(Constants.ElevatorConstants.ElevatorMotorAID);
-    TalonFX elevatorMotorB = new TalonFX(Constants.ElevatorConstants.ElevatorMotorBID);
+    //TalonFX elevatorMotorA = new TalonFX(Constants.ElevatorConstants.ElevatorMotorAID, "Canivore");
+    TalonFX elevatorMotorB = new TalonFX(Constants.ElevatorConstants.ElevatorMotorBID, "Canivore");
 
     public ElevatorSubsystem() {
-        setMotorSettings();
+        //setMotorSettings();
     }
+    /*
     public void setMotorSettings() {
+
+        //MotorOutputConfigs invert = new MotorOutputConfigs();
+        //invert.Inverted = InvertedValue.Clockwise_Positive;
 
         // Settings For Motor A
         TalonFXConfiguration motorAConfig = new TalonFXConfiguration();
@@ -45,6 +50,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         motorBSlot.kP = Constants.ElevatorConstants.bkP;
         motorBSlot.kI = Constants.ElevatorConstants.bkI;
         motorBSlot.kD = Constants.ElevatorConstants.bkD;
+        //elevatorMotorB.getConfigurator().apply(invert);
+        
 
         MotionMagicConfigs mmBConfig = motorBConfig.MotionMagic;
         mmBConfig.MotionMagicCruiseVelocity = Constants.ElevatorConstants.bmmCruiseVelocity;
@@ -52,35 +59,42 @@ public class ElevatorSubsystem extends SubsystemBase {
         // mmBConfig.MotionMagicJerk = Constants.ElevatorConstants.bmmJerk;
         elevatorMotorB.getConfigurator().apply(motorBConfig);
     }
+*/
 
     // povUp L4, povLeft L3, povRight L2, povDown L1
     MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
 
     public void setLevelOne() {
-        elevatorMotorA.setControl(positionVoltage.withPosition(10));
+        //elevatorMotorA.setControl(positionVoltage.withPosition(10));
         elevatorMotorB.setControl(positionVoltage.withPosition(10));
     }
 
     public void setLevelTwo() {
-        elevatorMotorA.setControl(positionVoltage.withPosition(30));
+        //elevatorMotorA.setControl(positionVoltage.withPosition(30));
         elevatorMotorB.setControl(positionVoltage.withPosition(30));
     }
 
     public void setLevelThree() {
-        elevatorMotorA.setControl(positionVoltage.withPosition(50));
+        //elevatorMotorA.setControl(positionVoltage.withPosition(50));
         elevatorMotorB.setControl(positionVoltage.withPosition(50));
     }
 
     public void setLevelFour() {
-        elevatorMotorA.setControl(positionVoltage.withPosition(70));
+        //elevatorMotorA.setControl(positionVoltage.withPosition(70));
         elevatorMotorB.setControl(positionVoltage.withPosition(70));
     }
 
     public Command setVoltage(double power) {
         return runOnce(() -> {
-            elevatorMotorA.setVoltage(power);
-            elevatorMotorB.setVoltage(power);
+            //elevatorMotorA.setVoltage(power);
+            elevatorMotorB.setVoltage(-power);
         });
+    }
+
+    @Override
+    public void periodic() {
+        //SmartDashboard.putNumber("elevatorMotorAPos", elevatorMotorA.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("elevatorMotorBPos", elevatorMotorB.getPosition().getValueAsDouble());
     }
     
 

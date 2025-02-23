@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -34,6 +36,27 @@ public final class Constants {
     public static final double bmmCruiseVelocity = 80, bmmAccel = 160, bmmJerk = 1600;
   }
 
+  public static class EndEffectorConstants {
+    public static final int EndEffectorMotorID = 11;
+  }
+
+  public static class FloorIntakeConstants {
+    public static final int leftPivotMotorID = 12;
+    public static final int leftWheelsMotorID = 13;
+    public static final int rightPivotMotorID = 14;
+    public static final int rightWheelsMotorID = 15;
+
+    public static final double leftkS = 0.25, leftkV = 0.12, leftkA = 0.01, leftkP = 4.8, leftkI = 0, leftkD = 0.1;
+    public static final double rightkS = 0.25, rightkV = 0.12, rightkA = 0.01, rightkP = 4.8, rightkI = 0, rightkD = 0.1;
+
+    public static final double leftmmCruiseVelocity = 80, leftmmAccel = 160, leftmmJerk = 1600;
+    public static final double rightmmCruiseVelocity = 80, rightmmAccel = 160, rightmmJerk = 1600;
+  }
+
+  public static class DeepCageConstants {
+    public static final int deepCageMotorID = 16;
+  }
+
   public static class TagConstants {
     public static final int Tag9Angle = 300;
     public static final int Tag8Angle = 240;
@@ -48,5 +71,43 @@ public final class Constants {
     public static final int Tag22Angle = 120;
     public static final int Tag17Angle = 60;
     public static final int Tag18Angle = 0;
+  }
+
+  public static class AlignmentConstants {
+    public static final Pose2d A_BLUE = new Pose2d(3.1, 4.19, new Rotation2d(Math.toRadians(0)));
+    public static final Pose2d A_RED = new Pose2d(14.381, 3.862, new Rotation2d(Math.toRadians(0)));
+
+    public static final Pose2d B_BLUE = new Pose2d(3.1, 3.83, new Rotation2d(Math.toRadians(0)));
+    public static final Pose2d B_RED = new Pose2d(14.386, 4.163, new Rotation2d(Math.toRadians(0)));
+
+    public static final Pose2d C_BLUE = new Pose2d(3.662, 2.963, new Rotation2d(Math.toRadians(60)));
+    public static final Pose2d C_RED = new Pose2d(13.871, 5.079, new Rotation2d(Math.toRadians(60)));
+
+    public static final Pose2d D_BLUE = new Pose2d(3.9, 2.818, new Rotation2d(Math.toRadians(60)));
+    public static final Pose2d D_RED = new Pose2d(13.579, 5.231, new Rotation2d(Math.toRadians(60)));
+
+    public static final Pose2d E_BLUE = new Pose2d(5.03, 2.828, new Rotation2d(Math.toRadians(120)));
+    public static final Pose2d E_RED = new Pose2d(12.531, 5.229, new Rotation2d(Math.toRadians(120)));
+
+    public static final Pose2d F_BLUE = new Pose2d(5.320, 2.963, new Rotation2d(Math.toRadians(120)));
+    public static final Pose2d F_RED = new Pose2d(12.261, 5.076, new Rotation2d(Math.toRadians(120)));
+
+    public static final Pose2d G_BLUE = new Pose2d(5.807, 3.833, new Rotation2d(Math.toRadians(180)));
+    public static final Pose2d G_RED = new Pose2d(11.750, 4.183, new Rotation2d(Math.toRadians(180)));
+
+    public static final Pose2d H_BLUE = new Pose2d(5.807, 4.175, new Rotation2d(Math.toRadians(180)));
+    public static final Pose2d H_RED = new Pose2d(11.750, 3.858, new Rotation2d(Math.toRadians(180)));
+
+    public static final Pose2d I_BLUE = new Pose2d(5.289, 5.077, new Rotation2d(Math.toRadians(240)));
+    public static final Pose2d I_RED = new Pose2d(12.258, 2.971, new Rotation2d(Math.toRadians(240)));
+
+    public static final Pose2d J_BLUE = new Pose2d(5.019, 5.232, new Rotation2d(Math.toRadians(240)));
+    public static final Pose2d J_RED = new Pose2d(12.544, 2.802, new Rotation2d(Math.toRadians(240)));
+
+    public static final Pose2d K_BLUE = new Pose2d(3.692, 5.062, new Rotation2d(Math.toRadians(300)));
+    public static final Pose2d K_RED = new Pose2d(13.564, 2.804, new Rotation2d(Math.toRadians(300)));
+
+    public static final Pose2d L_BLUE = new Pose2d(3.074, 5.056, new Rotation2d(Math.toRadians(300)));
+    public static final Pose2d L_RED = new Pose2d(13.564, 2.804, new Rotation2d(Math.toRadians(300)));
   }
 }

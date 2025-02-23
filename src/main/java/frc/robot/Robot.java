@@ -8,6 +8,9 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.ctre.phoenix6.Utils;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
@@ -28,14 +31,15 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-    alert = new Alert("Loading Motivational Speech Framework...", AlertType.kInfo);
+    alert = new Alert("Loading Motivation-ish Framework...", AlertType.kInfo);
     alert.set(true);
   }
 
-  public void motivationalQuotes() {
+  public void motivationalQuotes() { // Joke we are doing for the drivers during testing.
     Random random = new Random();
-    int choice = random.nextInt(38) + 1;
+    int choice = random.nextInt(84) + 1;
     switch (choice) {
+      // A missing semi-colon
       case 1:
         alert.setText("You can do it!");
         break;
@@ -55,7 +59,7 @@ public class Robot extends TimedRobot {
         alert.setText("Are you even reading these?");
         break;
       case 7:
-        alert.setText("Nice!");
+        alert.setText("Nice, but less important");
         break;
       case 8:
         alert.setText("It's not your fault.");
@@ -150,6 +154,147 @@ public class Robot extends TimedRobot {
       case 38:
         alert.setText("Don't give up!");
         break;
+      case 39:
+        alert.setText("FEAR THE DEER!!!");
+        break;
+      case 40:
+        alert.setText("This is a message supplying support for you to win this match by gaining more points than another team during this match. And therefore, you are motivated. Hooray.");
+        break;
+      case 41:
+        alert.setText("You will win, and then there will be cake.");
+        break;
+      case 42:
+        alert.setText("Keep calm and place coral");
+        break;
+      case 43:
+        alert.setText("We have been trying to contact you about your car's extended warranty.");
+        break;
+      case 44:
+        alert.setText("Charley enabled the robot.");
+        break;
+      case 45:
+        alert.setText("System.out.println(\"You're doing great!\")");
+        break;
+      case 46:
+        alert.setText("01001101 01101111 01110100 01101001 01110110 01100001 01110100 01101001 01101111 01101110 00101110");
+        break;
+      case 47:
+        alert.setText("Let's go STAGS! Let's go!");
+        break;
+      case 48:
+        alert.setText("Made with 0% recycled minerals");
+        break;
+      case 49:
+        alert.setText("3. 2. 1. Reefscape!");
+        break;
+      case 50:
+        alert.setText("(Don't tell Charley)");
+        break;
+      case 51:
+        alert.setText("Safety glasses!");
+        break;
+      case 52:
+        alert.setText("alert.setText(\"\");");
+        break;
+      case 53:
+        alert.setText("I used the code to delete the code.");
+        break;
+      case 54:
+        alert.setText("Charley looked at the text in confusion, as the programmers laughed about their silly joke. This is the joke.");
+        break;
+      case 55:
+        alert.setText("!yelrahC llet t'noD");
+        break;
+      case 56:
+        alert.setText("[Robot] wants to know your location");
+        break;
+      case 57:
+        alert.setText("The fitness gram pacer test is a multi-stage aerobics test that gets progressively harder each stage.");
+        break;
+      case 58:
+        alert.setText("What are you doing in my swamp!");
+        break;
+      case 100:
+        alert.setText("This message exists, but will never be seen. Isn't that weird?");
+        break;
+      case 59:
+        alert.setText("Either you run the robot, or the robot runs you.");
+        break;
+      case 60:
+        alert.setText("99% of drivers lose a match before they place coral. Not you.");
+        break;
+      case 61:
+        alert.setText("minecraft/assets/textures/model/lightly_waxed_weathered_cut_copper_stairs.json");
+        break;
+      case 62:
+        alert.setText("The code died. Sorry.");
+        break;
+      case 63:
+        alert.setText("Roses are red, violets are blue. There is a semi-colon missing, on line 42.");
+        break;
+      case 64:
+        alert.setText("If aliens invade earth, show them this message. Hi.");
+        break;
+      case 65:
+        alert.setText("Totally Legal™");
+        break;
+      case 66:
+        alert.setText("When every robot is going left, go right.");
+        break;
+      case 67:
+        alert.setText("Nice, but more important");
+        break;
+      case 68:
+        alert.setText("Programming 2: Electric Boogaloo");
+        break;
+      case 69:
+        alert.setText("The attack was super effective!");
+        break;
+      case 70:
+        alert.setText("Finish him");
+        break;
+      case 71:
+        alert.setText("What would FIRST think of this?");
+        break;
+      case 72:
+        alert.setText("Someone should write a research paper about this text box.");
+        break;
+      case 73:
+        alert.setText("Do you like chemistry jokes? Actually, I was going to tell one about Sodium and Hydrogen. But NaH.");
+        break;
+      case 74:
+        alert.setText("Yes, of course there's a point to this!");
+        break;
+      case 75:
+        alert.setText("Also try FTC!");
+        break;
+      case 76:
+        alert.setText("Long live the king!");
+        break;
+      case 77:
+        alert.setText("Jonas joined the game.");
+        break;
+      case 78:
+        alert.setText("Was Jonas here?");
+        break;
+      case 79:
+        alert.setText("May contain switch statements");
+        break;
+      case 80:
+        alert.setText("Collapse the children! (This is fine in context lol)");
+        break;
+      case 81:
+        alert.setText("This message was not written on April 78th, -20068 CE, at 25:76 RM");
+        break;
+      case 82:
+        alert.setText("Ctrl + S");
+        break;
+      case 83:
+        alert.setText("Does Hercules wear whitey tighties?");
+        break;
+      case 84:
+        alert.setText("So, does it work?");
+        break;
     }
   }
 
@@ -158,6 +303,8 @@ public class Robot extends TimedRobot {
     for (int port = 5800; port <= 5809; port++) {
             PortForwarder.add(port, "limelight.local", port);
     }
+    PathfindingCommand.warmupCommand().schedule();
+    FollowPathCommand.warmupCommand().schedule();
   }
 
   @Override
@@ -174,7 +321,7 @@ public class Robot extends TimedRobot {
      */
     if (kUseLimelight) {
       var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      if (llMeasurement != null) {
+      if (llMeasurement != null && llMeasurement.tagCount > 0) {
         m_robotContainer.drivetrain.addVisionMeasurement(llMeasurement.pose, Utils.fpgaToCurrentTime(llMeasurement.timestampSeconds));
       }
     }
