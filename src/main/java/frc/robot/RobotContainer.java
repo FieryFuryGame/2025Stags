@@ -11,12 +11,15 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -79,8 +82,6 @@ public class RobotContainer {
 
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
-            
-
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
@@ -88,7 +89,7 @@ public class RobotContainer {
             )
         );
 
-        Constants.OperatorConstants.driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        Constants.OperatorConstants.driverController.x().whileTrue(drivetrain.applyRequest(() -> brake));
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Constants.OperatorConstants.driverController.getLeftY(), -Constants.OperatorConstants.driverController.getLeftX()))
         ));
@@ -100,11 +101,12 @@ public class RobotContainer {
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight").pose)).andThen(limelight.setPathfindPose()).andThen(limelight.pathfind())); // Legacy Control
-        // Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.getPathToTag("left")).unless(() -> limelight.tid.getDouble(0.0) <= 0).andThen(limelight.pathfindWithPath()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
-        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> {
-            System.out.println(AutoBuilder.getCurrentPose());
-        }));
+        //Constants.OperatorConstants.driverController.leftBumper().onTrue(limelight.setPathfindPose().andThen(limelight.pathfind())); // Legacy Control
+        //Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.getPathToTag("Left")).unless(() -> limelight.tid.getDouble(0.0) <= 0).andThen(limelight.pathfindWithPath()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        //Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(limelight.pathfindWithPath("Left")));
+        //Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(limelight.pathfindWithPath("Right")).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        //Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(limelight.pathfindWithPath("Center")).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -114,19 +116,19 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.start().and(Constants.OperatorConstants.driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        Constants.OperatorConstants.driverController.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        Constants.OperatorConstants.driverController.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         
         Constants.OperatorConstants.operatorController.leftTrigger()
-            .whileTrue(m_elevator.setVoltage(0.05))
+            .whileTrue(m_elevator.setVoltage(6))
             .onFalse(m_elevator.setVoltage(0));
         Constants.OperatorConstants.operatorController.rightTrigger()
-            .whileTrue(m_elevator.setVoltage(-0.05))
+            .whileTrue(m_elevator.setVoltage(-6))
             .onFalse(m_elevator.setVoltage(0));
         /*
-        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> m_elevator.setLevelOne()));
+        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> m_elevator.setLevelThree()));
         Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> m_elevator.setLevelTwo()));
-        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> m_elevator.setLevelThree()));
-        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> m_elevator.setLevelFour()));
+        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> m_elevator.setLevelFour()));
+        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> m_elevator.setLevelOne()));
         */
 
         // Constants.OperatorConstants.operatorController.a().onTrue(m_effector.runEffector());

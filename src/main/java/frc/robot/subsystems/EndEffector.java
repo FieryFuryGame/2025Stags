@@ -10,7 +10,7 @@ import frc.robot.Constants;
 
 public class EndEffector extends SubsystemBase {
 
-    TalonFX endEffectorMotor = new TalonFX(Constants.EndEffectorConstants.EndEffectorMotorID);
+    TalonFX endEffectorMotor = new TalonFX(Constants.EndEffectorConstants.EndEffectorMotorID, "Canivore");
     DigitalInput beamBreak = new DigitalInput(0);
     
     public EndEffector() {

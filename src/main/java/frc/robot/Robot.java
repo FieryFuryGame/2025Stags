@@ -8,6 +8,9 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.ctre.phoenix6.Utils;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
@@ -34,11 +37,11 @@ public class Robot extends TimedRobot {
 
   public void motivationalQuotes() { // Joke we are doing for the drivers during testing.
     Random random = new Random();
-    int choice = random.nextInt(83) + 1;
+    int choice = random.nextInt(84) + 1;
     switch (choice) {
+      // A missing semi-colon
       case 1:
         alert.setText("You can do it!");
-        // A missing semi-colon
         break;
       case 2:
         alert.setText("Loading message failed: [click to view error]");
@@ -286,6 +289,12 @@ public class Robot extends TimedRobot {
       case 82:
         alert.setText("Ctrl + S");
         break;
+      case 83:
+        alert.setText("Does Hercules wear whitey tighties?");
+        break;
+      case 84:
+        alert.setText("So, does it work?");
+        break;
     }
   }
 
@@ -294,6 +303,8 @@ public class Robot extends TimedRobot {
     for (int port = 5800; port <= 5809; port++) {
             PortForwarder.add(port, "limelight.local", port);
     }
+    PathfindingCommand.warmupCommand().schedule();
+    FollowPathCommand.warmupCommand().schedule();
   }
 
   @Override

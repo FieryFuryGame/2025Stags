@@ -31,7 +31,14 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "L4",
+      "waypointRelativePos": 0.4969615124915503,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3,
     "maxAcceleration": 3,
@@ -42,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -118.73979529168795
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": null,

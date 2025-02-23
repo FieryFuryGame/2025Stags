@@ -18,6 +18,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
@@ -61,9 +62,19 @@ public class Limelight extends SubsystemBase {
     public int teamAdd = 0;
     public int rotateDirection = 0;
     int tagAngle;
-    Pose2d targetPose;
-    List<Waypoint> waypoints;
-    PathPlannerPath alignmentPath;
+    Pose2d targetPose = new Pose2d();
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints = new PathConstraints(
+        4.0, 3.0,
+        Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+        new Pose2d(1.0, 1.0, Rotation2d.fromDegrees(0)),
+        new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
+        new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90))
+    );
+    PathPlannerPath alignmentPath = new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0.0, Rotation2d.fromDegrees(-90)));
 
     InterpolatingDoubleTreeMap areaMap = new InterpolatingDoubleTreeMap();
 
@@ -112,25 +123,23 @@ public class Limelight extends SubsystemBase {
         return distanceFromLimelightToGoalInches;
     }
 
-    // Create the constraints to use while pathfinding
-    PathConstraints constraints = new PathConstraints(
-        0.5, 0.2,
-        Units.degreesToRadians(540), Units.degreesToRadians(720));
+    
 
-    public void getPathToTag(String trigger) { // Uses the tag id and the name to find the path file we've created.
+    public PathPlannerPath getPathToTag(String trigger) { // Uses the tag id and the name to find the path file we've created.
         try{
-            alignmentPath = PathPlannerPath.fromPathFile((int) tid.getDouble(0.0) + trigger);
-            alignmentPath.preventFlipping = false;
+            PathPlannerPath path = PathPlannerPath.fromPathFile("21Center");
+            path.preventFlipping = false;
+            System.out.println("[Pathfinder] Pathfinding to the " + trigger + "of AprilTag!");
+            return path;
 
         } catch (Exception e) {
-            DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+            DriverStation.reportError("[Pathfinder] Big oops: " + e.getMessage(), e.getStackTrace());
+            return alignmentPath;
         }
     }
 
-    public Command pathfindWithPath() { // Pathfinds to the start of the path, then aligns with the path.
-        return Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(
-            AutoBuilder.pathfindThenFollowPath(alignmentPath, constraints)
-        );
+    public Command pathfindWithPath(String trigger) { // Pathfinds to the start of the path, then aligns with the path.
+        return AutoBuilder.pathfindThenFollowPath(getPathToTag(trigger), constraints);
     }
 
     public Command pathfind() {

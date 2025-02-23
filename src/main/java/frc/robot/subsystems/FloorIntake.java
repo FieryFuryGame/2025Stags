@@ -14,12 +14,12 @@ import frc.robot.Constants.FloorIntakeConstants;
 
 public class FloorIntake extends SubsystemBase {
 
-    TalonFX leftPivot = new TalonFX(FloorIntakeConstants.leftPivotMotorID);
-    TalonFX leftWheels = new TalonFX(FloorIntakeConstants.leftWheelsMotorID);
+    TalonFX leftPivot = new TalonFX(FloorIntakeConstants.leftPivotMotorID, "Canivore");
+    TalonFX leftWheels = new TalonFX(FloorIntakeConstants.leftWheelsMotorID, "Canivore");
     public boolean leftDown = false;
 
-    TalonFX rightPivot = new TalonFX(FloorIntakeConstants.rightPivotMotorID);
-    TalonFX rightWheels = new TalonFX(FloorIntakeConstants.rightWheelsMotorID);
+    TalonFX rightPivot = new TalonFX(FloorIntakeConstants.rightPivotMotorID, "Canivore");
+    TalonFX rightWheels = new TalonFX(FloorIntakeConstants.rightWheelsMotorID, "Canivore");
     public boolean rightDown = false;
 
     DigitalInput beamBreakLeft = new DigitalInput(1);

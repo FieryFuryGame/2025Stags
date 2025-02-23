@@ -10,7 +10,7 @@ import frc.robot.Constants.DeepCageConstants;
 
 public class DeepCage extends SubsystemBase {
 
-    TalonFX deepCageMotor = new TalonFX(DeepCageConstants.deepCageMotorID);
+    TalonFX deepCageMotor = new TalonFX(DeepCageConstants.deepCageMotorID, "Canivore");
 
     MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
     
