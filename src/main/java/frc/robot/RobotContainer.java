@@ -11,11 +11,9 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -102,10 +100,9 @@ public class RobotContainer {
         );
 
         //Constants.OperatorConstants.driverController.leftBumper().onTrue(limelight.setPathfindPose().andThen(limelight.pathfind())); // Legacy Control
-        //Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.getPathToTag("Left")).unless(() -> limelight.tid.getDouble(0.0) <= 0).andThen(limelight.pathfindWithPath()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
-        //Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(limelight.pathfindWithPath("Left")));
-        //Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(limelight.pathfindWithPath("Right")).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
-        //Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> Pathfinding.setStartPosition(new Translation2d(drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY()))).andThen(limelight.pathfindWithPath("Center")).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Left").schedule()));//.unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Right").schedule()));//.unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Center").schedule()));//.unless(() -> limelight.tid.getDouble(0.0) <= 0));
         Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
 
         // Run SysId routines when holding back/start and X/Y.
