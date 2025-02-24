@@ -127,15 +127,25 @@ public class Limelight extends SubsystemBase {
 
     public PathPlannerPath getPathToTag(String trigger) { // Uses the tag id and the name to find the path file we've created.
         try{
-            PathPlannerPath path = PathPlannerPath.fromPathFile("21Center");
+            PathPlannerPath path = PathPlannerPath.fromPathFile("19Left");
             path.preventFlipping = false;
-            System.out.println("[Pathfinder] Pathfinding to the " + trigger + "of AprilTag!");
+            System.out.println("[Pathfinder] Pathfinding to the " + trigger + " of AprilTag!");
             return path;
 
         } catch (Exception e) {
             DriverStation.reportError("[Pathfinder] Big oops: " + e.getMessage(), e.getStackTrace());
+            waypoints = PathPlannerPath.waypointsFromPoses(
+                drivetrain.getState().Pose,
+                drivetrain.getState().Pose
+            );
+            alignmentPath = new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0.0, Rotation2d.fromDegrees(drivetrain.getState().Pose.getRotation().getDegrees())));
             return alignmentPath;
         }
+    }
+
+    public PathPlannerPath resetPath() {
+        alignmentPath = new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0.0, Rotation2d.fromDegrees(drivetrain.getState().Pose.getRotation().getDegrees())));
+        return alignmentPath;
     }
 
     public Command pathfindWithPath(String trigger) { // Pathfinds to the start of the path, then aligns with the path.
