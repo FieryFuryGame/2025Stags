@@ -9,8 +9,6 @@ import java.util.Random;
 
 import com.ctre.phoenix6.Utils;
 import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathfindingCommand;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;

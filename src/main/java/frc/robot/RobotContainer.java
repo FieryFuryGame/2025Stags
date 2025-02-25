@@ -43,8 +43,6 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-    private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -91,15 +89,7 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Constants.OperatorConstants.driverController.getLeftY(), -Constants.OperatorConstants.driverController.getLeftX()))
         ));
-        
-        Constants.OperatorConstants.driverController.pov(0).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
-        );
-        Constants.OperatorConstants.driverController.pov(180).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        );
 
-        //Constants.OperatorConstants.driverController.leftBumper().onTrue(limelight.setPathfindPose().andThen(limelight.pathfind())); // Legacy Control
         Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Left").schedule()));//.unless(() -> limelight.tid.getDouble(0.0) <= 0));
         Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Right").schedule()));//.unless(() -> limelight.tid.getDouble(0.0) <= 0));
         Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Center").schedule()));//.unless(() -> limelight.tid.getDouble(0.0) <= 0));
@@ -114,6 +104,9 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         Constants.OperatorConstants.driverController.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        Constants.OperatorConstants.driverController.povUp().onTrue(Commands.runOnce(() -> limelight.override += 1));
+        Constants.OperatorConstants.driverController.povDown().onTrue(Commands.runOnce(() -> limelight.override -= 1));
         
         Constants.OperatorConstants.operatorController.leftTrigger()
             .whileTrue(m_elevator.setVoltage(6))
