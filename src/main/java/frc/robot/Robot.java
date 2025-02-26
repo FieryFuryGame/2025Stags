@@ -9,6 +9,7 @@ import java.util.Random;
 
 import com.ctre.phoenix6.Utils;
 import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
@@ -23,7 +24,7 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
-  private final boolean kUseLimelight = false;
+  private final boolean kUseLimelight = true;
 
   Alert alert;
 
@@ -302,6 +303,7 @@ public class Robot extends TimedRobot {
             PortForwarder.add(port, "limelight.local", port);
     }
     FollowPathCommand.warmupCommand().schedule();
+    PathfindingCommand.warmupCommand().schedule();
   }
 
   @Override
@@ -361,6 +363,8 @@ public class Robot extends TimedRobot {
     } else {
       m_robotContainer.limelight.teamAdd = 0;
     }
+
+    m_robotContainer.limelight.checkAlliance();
     
     motivationalQuotes();
 

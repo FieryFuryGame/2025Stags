@@ -44,7 +44,7 @@ public class Limelight extends SubsystemBase {
     double ThreeDDistanceMeasurement;
     public int teamAdd = 0;
     public int rotateDirection = 0;
-    public int override = 6;
+    public double override = 6;
     int tagAngle;
     Pose2d targetPose = new Pose2d();
 
@@ -101,15 +101,39 @@ public class Limelight extends SubsystemBase {
         }
     }
 
+    public void checkAlliance() {
+        try {
+            if (DriverStation.getAlliance().get() == Alliance.Red) {
+                LimelightHelpers.setPipelineIndex(name, 1);
+                System.out.println("[Limelight] Configured For Alliance Red");
+            } else {
+                LimelightHelpers.setPipelineIndex(name, 0);
+                System.out.println("[Limelight] Configured For Alliance Blue");
+            }
+        } catch (Exception e) {
+            System.out.println("[Limelight] Could not configure. Be careful using pathfinding.");
+        }
+        
+    }
+
+    public void printID() {
+        try {
+            System.out.println((int) tid.getDouble(0.0));
+        } catch (Exception e) {
+            System.out.println("Null!");
+        }
+    }
+
     public PathPlannerPath getPathToTag(String trigger) { // Uses the tag id and the name to find the path file we've created.
         try{
-            if(override <= 11) {
-                PathPlannerPath path = PathPlannerPath.fromPathFile((override + 11) + getTriggerPressed(trigger));
+            int id = (int) tid.getDouble(0.0);
+            if(id <= 11) {
+                PathPlannerPath path = PathPlannerPath.fromPathFile((id + 11) + getTriggerPressed(trigger));
                 path.preventFlipping = false;
                 System.out.println("[Pathfinder] Pathfinding to the " + trigger + " of AprilTag!");
                 return path.mirrorPath();
             } else {
-                PathPlannerPath path = PathPlannerPath.fromPathFile(override + getTriggerPressed(trigger));
+                PathPlannerPath path = PathPlannerPath.fromPathFile(id + getTriggerPressed(trigger));
                 path.preventFlipping = false;
                 System.out.println("[Pathfinder] Pathfinding to the " + trigger + " of AprilTag!");
                 return path;
@@ -121,6 +145,7 @@ public class Limelight extends SubsystemBase {
                 drivetrain.getState().Pose
             );
             alignmentPath = new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0.0, Rotation2d.fromDegrees(drivetrain.getState().Pose.getRotation().getDegrees())));
+            alignmentPath.preventFlipping = true;
             return alignmentPath;
         }
     }

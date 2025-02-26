@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.LimelightHelpers.PoseEstimate;
@@ -85,14 +86,15 @@ public class RobotContainer {
             )
         );
 
-        Constants.OperatorConstants.driverController.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        // Constants.OperatorConstants.driverController.x().whileTrue(drivetrain.applyRequest(() -> brake));
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Constants.OperatorConstants.driverController.getLeftY(), -Constants.OperatorConstants.driverController.getLeftX()))
         ));
 
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Left").schedule()));//.unless(() -> limelight.tid.getDouble(0.0) <= 0));
-        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Right").schedule()));//.unless(() -> limelight.tid.getDouble(0.0) <= 0));
-        Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Center").schedule()));//.unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Left").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Right").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Center").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        Constants.OperatorConstants.driverController.povLeft().onTrue(Commands.runOnce(() -> limelight.printID()));
         Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
 
         // Run SysId routines when holding back/start and X/Y.
@@ -109,10 +111,10 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.povDown().onTrue(Commands.runOnce(() -> limelight.override -= 1));
         
         Constants.OperatorConstants.operatorController.leftTrigger()
-            .whileTrue(m_elevator.setVoltage(6))
+            .whileTrue(m_elevator.setVoltage(3))
             .onFalse(m_elevator.setVoltage(0));
         Constants.OperatorConstants.operatorController.rightTrigger()
-            .whileTrue(m_elevator.setVoltage(-6))
+            .whileTrue(m_elevator.setVoltage(-3))
             .onFalse(m_elevator.setVoltage(0));
         /*
         Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> m_elevator.setLevelThree()));
