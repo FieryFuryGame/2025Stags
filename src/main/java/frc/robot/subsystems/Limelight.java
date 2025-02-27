@@ -44,7 +44,7 @@ public class Limelight extends SubsystemBase {
     double ThreeDDistanceMeasurement;
     public int teamAdd = 0;
     public int rotateDirection = 0;
-    public double override = 6;
+    public int override = 6;
     int tagAngle;
     Pose2d targetPose = new Pose2d();
 
@@ -113,7 +113,6 @@ public class Limelight extends SubsystemBase {
         } catch (Exception e) {
             System.out.println("[Limelight] Could not configure. Be careful using pathfinding.");
         }
-        
     }
 
     public void printID() {
