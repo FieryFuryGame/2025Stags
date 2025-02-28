@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.EjectCoral;
 import frc.robot.commands.LoadCoral;
 import frc.robot.generated.TunerConstants;
@@ -88,15 +89,10 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Left").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
         Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Right").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
         Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Center").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
-        Constants.OperatorConstants.driverController.povLeft().onTrue(Commands.runOnce(() -> limelight.printID()));
+        
         Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
-
-        // reset the field-centric heading on left bumper press
         Constants.OperatorConstants.driverController.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        Constants.OperatorConstants.driverController.povUp().onTrue(Commands.runOnce(() -> limelight.override += 1));
-        Constants.OperatorConstants.driverController.povDown().onTrue(Commands.runOnce(() -> limelight.override -= 1));
-        
         Constants.OperatorConstants.operatorController.leftTrigger()
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(3)))
             .onFalse(elevator.setVoltage(0));
@@ -111,29 +107,8 @@ public class RobotContainer {
 
         Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
         Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));
-
-        // Constants.OperatorConstants.operatorController.leftBumper().onTrue(floorIntake.leftToggle());
-        // Constants.OperatorConstants.operatorController.rightBumper().onTrue(floorIntake.rightToggle());
-
-        Constants.OperatorConstants.operatorController.leftStick().whileTrue(elevator.setVoltage(MathUtil.applyDeadband(Constants.OperatorConstants.operatorController.getLeftY(), 0.1))).onFalse(elevator.setVoltage(0.0));
+        Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> new EffectorPivot(effector).execute()));
         
-        /*
-
-        Constants.OperatorConstants.operatorController.x().onTrue(floorIntake.intake().until(() -> floorIntake.floorLeftLoaded() || floorIntake.floorRightLoaded()).andThen(
-            floorIntake.powerLeftIntake(0.0).alongWith(floorIntake.powerRightIntake(0.0))
-        ));
-
-        Constants.OperatorConstants.operatorController.y().onTrue(floorIntake.eject().andThen(new WaitCommand(0.5))
-            .andThen(floorIntake.powerLeftIntake(0.0).alongWith(floorIntake.powerRightIntake(0.0))));
-         */
-
-        // Constants.OperatorConstants.driverController.leftTrigger().whileTrue(deepCage.move(0.0)).onFalse(deepCage.move(0.0));
-        // Constants.OperatorConstants.driverController.rightTrigger().whileTrue(deepCage.move(0.0)).onFalse(deepCage.move(0.0));
-
-        // Constants.OperatorConstants.driverController.leftTrigger().whileTrue(deepCage.moveWithLimitUp(0.0)).onFalse(deepCage.move(0.0));
-        // Constants.OperatorConstants.driverController.rightTrigger().whileTrue(deepCage.moveWithLimitDown(0.0)).onFalse(deepCage.move(0.0));
-        
-
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 

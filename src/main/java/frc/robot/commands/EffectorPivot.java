@@ -12,11 +12,11 @@ import frc.robot.subsystems.EndEffector;
 /*This is an example of creating a command as a class. The base Command class provides a set of methods that your command
  * will override.
  */
-public class EjectCoral extends Command {
+public class EffectorPivot extends Command {
   EndEffector m_effector;
 
   /** Creates a new LaunchNote. */
-  public EjectCoral(EndEffector effector) {
+  public EffectorPivot(EndEffector effector) {
     // save the launcher system internally
     m_effector = effector;
 
@@ -33,11 +33,14 @@ public class EjectCoral extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!m_effector.beamBreak.get()) {
-      System.out.println("[Effector] Ejecting");
-      m_effector.setWheelVoltage(-6);
+    if (m_effector.pivotDown) {
+        m_effector.useMotionMagic(7);
+        m_effector.pivotDown = false;
+        System.out.println("Pivot Down");
     } else {
-      m_effector.setWheelVoltage(0);
+        m_effector.useMotionMagic(0);
+        m_effector.pivotDown = true;
+        System.out.println("Pivot Up");
     }
   }
 
@@ -50,7 +53,6 @@ public class EjectCoral extends Command {
   }
   @Override
   public void end(boolean interrupted) {
-    // Stop the wheels when the command ends.
-    m_effector.setWheelVoltage(0);
+    
   }
 }

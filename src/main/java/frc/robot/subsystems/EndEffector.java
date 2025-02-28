@@ -18,10 +18,10 @@ public class EndEffector extends SubsystemBase {
 
     TalonFX effectorWheels = new TalonFX(Constants.EndEffectorConstants.EffectorWheelsID, "Canivore");
     TalonFX effectorPivot = new TalonFX(Constants.EndEffectorConstants.EffectorPivotID, "Canivore");
-    public DigitalInput beamBreak = new DigitalInput(1);
+    public DigitalInput beamBreak = new DigitalInput(0);
 
     MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
-    public boolean pivotDown;
+    public boolean pivotDown = true; // When turned on, the pivot should be down immediately.
     
     public EndEffector() {
         // This is very useful. Does a lot.
@@ -62,7 +62,7 @@ public class EndEffector extends SubsystemBase {
         return runOnce(() -> effectorPivot.setVoltage(power));
     }
 
-    public Command useMotionMagic(double position) {
+    public Command useMotionMagicCommand(double position) {
         return runOnce(() -> effectorPivot.setControl(positionVoltage.withPosition(position).withSlot(0)));
     }
 
@@ -72,10 +72,14 @@ public class EndEffector extends SubsystemBase {
 
     public Command runEffectorPivot() {
         if (pivotDown) {
-            return useMotionMagic(effectorPivot.getPosition().getValueAsDouble()).alongWith(Commands.runOnce(() -> pivotDown = false));
+            return useMotionMagicCommand(7).alongWith(Commands.runOnce(() -> pivotDown = false).andThen(() -> System.out.println("[Effector] Pivot Down")));
         } else {
-            return useMotionMagic(effectorPivot.getPosition().getValueAsDouble()).alongWith(Commands.runOnce(() -> pivotDown = true));
+            return useMotionMagicCommand(0).alongWith(Commands.runOnce(() -> pivotDown = true).andThen(() -> System.out.println("[Effector] Pivot Up")));
         }
+    }
+
+    public void useMotionMagic(double pos) {
+        effectorPivot.setControl(positionVoltage.withPosition(pos).withSlot(0));
     }
 
     public Command intake() {

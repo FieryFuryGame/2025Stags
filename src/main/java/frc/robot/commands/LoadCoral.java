@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.EndEffector;
 
 // import frc.robot.subsystems.CANLauncher;
@@ -35,6 +34,7 @@ public class LoadCoral extends Command {
   @Override
   public void execute() {
     if (m_effector.beamBreak.get()) {
+      System.out.println("[Effector] Intaking");
       m_effector.setWheelVoltage(-4.5);
     } else {
       m_effector.setWheelVoltage(0);

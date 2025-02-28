@@ -5,23 +5,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.EndEffector;
+import frc.robot.subsystems.FloorIntake;
 
-// import frc.robot.subsystems.CANLauncher;
-
-/*This is an example of creating a command as a class. The base Command class provides a set of methods that your command
- * will override.
- */
-public class EjectCoral extends Command {
-  EndEffector m_effector;
+public class FloorIntakeLeftToggle extends Command {
+  FloorIntake m_intake;
 
   /** Creates a new LaunchNote. */
-  public EjectCoral(EndEffector effector) {
+  public FloorIntakeLeftToggle(FloorIntake intake) {
     // save the launcher system internally
-    m_effector = effector;
+    m_intake = intake;
 
     // indicate that this command requires the launcher system
-    addRequirements(m_effector);
+    addRequirements(intake);
   }
 
   // The initialize method is called when the command is initially scheduled.
@@ -33,11 +28,12 @@ public class EjectCoral extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!m_effector.beamBreak.get()) {
-      System.out.println("[Effector] Ejecting");
-      m_effector.setWheelVoltage(-6);
+    if (m_intake.leftDown) {
+        m_intake.LeftMM(0);
+        m_intake.leftDown = false;
     } else {
-      m_effector.setWheelVoltage(0);
+        m_intake.LeftMM(0);
+        m_intake.leftDown = true;
     }
   }
 
@@ -50,7 +46,6 @@ public class EjectCoral extends Command {
   }
   @Override
   public void end(boolean interrupted) {
-    // Stop the wheels when the command ends.
-    m_effector.setWheelVoltage(0);
+    
   }
 }

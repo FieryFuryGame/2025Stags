@@ -22,11 +22,13 @@ public class FloorIntake extends SubsystemBase {
     TalonFX rightWheels = new TalonFX(FloorIntakeConstants.rightWheelsMotorID, "Canivore");
     public boolean rightDown = false;
 
-    DigitalInput beamBreakLeft = new DigitalInput(1);
-    DigitalInput beamBreakRight = new DigitalInput(2);
+    public DigitalInput beamBreakLeft = new DigitalInput(2);
+    public DigitalInput beamBreakRight = new DigitalInput(4);
     
     public FloorIntake() {
         setMotorSettings();
+        leftPivot.setPosition(0);
+        rightPivot.setPosition(0);
     }
 
     public void setMotorSettings() {
@@ -97,6 +99,10 @@ public class FloorIntake extends SubsystemBase {
         });
     }
 
+    public void LeftMM(double position) {
+        leftPivot.setControl(positionVoltage.withPosition(position));
+    }
+
     public Command rightUp() {
         return runOnce(() -> {
             rightPivot.setControl(positionVoltage.withPosition(rightPivot.getPosition().getValueAsDouble())); // Replace with up position
@@ -109,6 +115,18 @@ public class FloorIntake extends SubsystemBase {
             rightPivot.setControl(positionVoltage.withPosition(rightPivot.getPosition().getValueAsDouble())); // Replace with down position
             rightDown = true;
         });
+    }
+
+    public void RightMM(double position) {
+        rightPivot.setControl(positionVoltage.withPosition(position));
+    }
+
+    public void powerLeft(double power) {
+        leftWheels.setVoltage(power);
+    }
+
+    public void powerRight(double power) {
+        rightWheels.setVoltage(power);
     }
 
     public Command powerLeftIntake(double power) {
