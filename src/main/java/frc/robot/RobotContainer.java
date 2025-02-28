@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.commands.EjectCoral;
+import frc.robot.commands.LoadCoral;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.DeepCage;
@@ -45,7 +47,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final ElevatorSubsystem elevator = new ElevatorSubsystem();
-    // public final EndEffector effector = new EndEffector();
+    public final EndEffector effector = new EndEffector();
     // public final FloorIntake floorIntake = new FloorIntake();
     // public final DeepCage deepCage = new DeepCage();
     public final Limelight limelight = new Limelight("limelight", drivetrain);
@@ -97,24 +99,27 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.povDown().onTrue(Commands.runOnce(() -> limelight.override -= 1));
         
         Constants.OperatorConstants.operatorController.leftTrigger()
-            .whileTrue(elevator.setVoltage(3))
+            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(3)))
             .onFalse(elevator.setVoltage(0));
-        Constants.OperatorConstants.operatorController.rightTrigger()
-            .whileTrue(elevator.setVoltage(-3))
+            Constants.OperatorConstants.operatorController.rightTrigger()
+            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-3)))
             .onFalse(elevator.setVoltage(0));
-        /*
-        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
-        Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
-        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
-        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelOne()));
-        */
 
-        // Constants.OperatorConstants.operatorController.a().onTrue(effector.runEffector());
+        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
+        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
+        Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
+        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> elevator.setLevelOne()));
+
+        Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
+        Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));
 
         // Constants.OperatorConstants.operatorController.leftBumper().onTrue(floorIntake.leftToggle());
         // Constants.OperatorConstants.operatorController.rightBumper().onTrue(floorIntake.rightToggle());
+
+        Constants.OperatorConstants.operatorController.leftStick().whileTrue(elevator.setVoltage(MathUtil.applyDeadband(Constants.OperatorConstants.operatorController.getLeftY(), 0.1))).onFalse(elevator.setVoltage(0.0));
         
         /*
+
         Constants.OperatorConstants.operatorController.x().onTrue(floorIntake.intake().until(() -> floorIntake.floorLeftLoaded() || floorIntake.floorRightLoaded()).andThen(
             floorIntake.powerLeftIntake(0.0).alongWith(floorIntake.powerRightIntake(0.0))
         ));

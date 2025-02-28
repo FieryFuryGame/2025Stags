@@ -1,36 +1,103 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 
 public class EndEffector extends SubsystemBase {
 
-    TalonFX endEffectorMotor = new TalonFX(Constants.EndEffectorConstants.EndEffectorMotorID, "Canivore");
-    DigitalInput beamBreak = new DigitalInput(0);
+    TalonFX effectorWheels = new TalonFX(Constants.EndEffectorConstants.EffectorWheelsID, "Canivore");
+    TalonFX effectorPivot = new TalonFX(Constants.EndEffectorConstants.EffectorPivotID, "Canivore");
+    public DigitalInput beamBreak = new DigitalInput(1);
+
+    MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
+    public boolean pivotDown;
     
     public EndEffector() {
         // This is very useful. Does a lot.
+        setMotorSettings();
+        effectorPivot.setPosition(0.0);
+        effectorPivot.setControl(positionVoltage.withPosition(effectorPivot.getPosition().getValueAsDouble()).withSlot(0));
     }
 
-    public Command setVoltage(double power) {
-        return runOnce(() -> endEffectorMotor.setVoltage(power));
+    public void setMotorSettings() {
+
+        // Settings For Motor B
+        TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
+        Slot0Configs pivotSlot = pivotConfig.Slot0;
+        pivotSlot.kS = Constants.EndEffectorConstants.pivotkS;
+        pivotSlot.kV = Constants.EndEffectorConstants.pivotkV;
+        pivotSlot.kA = Constants.EndEffectorConstants.pivotkA;
+        pivotSlot.kP = Constants.EndEffectorConstants.pivotkP;
+        pivotSlot.kI = Constants.EndEffectorConstants.pivotkI;
+        pivotSlot.kD = Constants.EndEffectorConstants.pivotkD;
+        
+        MotionMagicConfigs mmpivotConfig = pivotConfig.MotionMagic;
+        mmpivotConfig.MotionMagicCruiseVelocity = Constants.EndEffectorConstants.pivotmmCruiseVelocity;
+        mmpivotConfig.MotionMagicAcceleration = Constants.EndEffectorConstants.pivotmmAccel;
+        // mmBConfig.MotionMagicJerk = Constants.ElevatorConstants.bmmJerk;
+        effectorPivot.getConfigurator().apply(pivotConfig);
+        effectorPivot.getConfigurator().apply(mmpivotConfig);
+    }
+
+    public Command setWheelVoltageCommand(double power) {
+        return runOnce(() -> effectorWheels.setVoltage(power));
+    }
+
+    public void setWheelVoltage(double power) {
+        effectorWheels.setVoltage(power);
+    }
+
+    public Command setPivotVoltage(double power) {
+        return runOnce(() -> effectorPivot.setVoltage(power));
+    }
+
+    public Command useMotionMagic(double position) {
+        return runOnce(() -> effectorPivot.setControl(positionVoltage.withPosition(position).withSlot(0)));
     }
 
     public boolean isCoralLoaded() {
-        return !beamBreak.get();
+        return !beamBreak.get(); // True if coral loaded, false if not
     }
 
-    public Command runEffector() {
-        if (isCoralLoaded()) {
-            return setVoltage(0.0).until(() -> !isCoralLoaded()).andThen(new WaitCommand(0.0)).andThen(setVoltage(0.0));
+    public Command runEffectorPivot() {
+        if (pivotDown) {
+            return useMotionMagic(effectorPivot.getPosition().getValueAsDouble()).alongWith(Commands.runOnce(() -> pivotDown = false));
         } else {
-            return setVoltage(0.0).until(() -> isCoralLoaded()).andThen(new WaitCommand(0.0)).andThen(setVoltage(0.0));
+            return useMotionMagic(effectorPivot.getPosition().getValueAsDouble()).alongWith(Commands.runOnce(() -> pivotDown = true));
         }
+    }
+
+    public Command intake() {
+        if (isCoralLoaded()) {
+            return setWheelVoltageCommand(0);
+        } else {
+            return setWheelVoltageCommand(-6);
+        }
+    }
+
+    public Command eject() {
+        if (!isCoralLoaded()) {
+            return setWheelVoltageCommand(0);
+        } else {
+            return setWheelVoltageCommand(-6);
+        }
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("endEffectorPivotPos", effectorPivot.getPosition().getValueAsDouble());
+        SmartDashboard.putBoolean("coralLoadedInEffector", isCoralLoaded());
     }
     
 }
