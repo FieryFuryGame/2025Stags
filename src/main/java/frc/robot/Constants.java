@@ -28,7 +28,7 @@ public final class Constants {
     // PID for motor B
     public static final double kS = 0.25, kV = 0.12, kA = 0.01, kP = 4.8, kI = 0, kD = 0.1, kG = 0.2;
     // Motion Magic Config B
-    public static final double mmCruiseVelocity = 200, mmAccel = 400, mmJerk = 1600;
+    public static final double mmCruiseVelocity = 400, mmAccel = 600, mmJerk = 1600;
   }
 
   public static class EndEffectorConstants {

@@ -35,7 +35,7 @@ public class LoadCoral extends Command {
   @Override
   public void execute() {
     if (m_effector.beamBreak.get()) {
-      m_effector.setWheelVoltage(-6);
+      m_effector.setWheelVoltage(-4.5);
     } else {
       m_effector.setWheelVoltage(0);
     }

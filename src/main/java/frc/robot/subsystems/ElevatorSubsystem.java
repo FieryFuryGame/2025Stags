@@ -67,17 +67,17 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setLevelTwo() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(90).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(88).withSlot(0));
     }
 
     public void setLevelThree() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(136).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(130).withSlot(0));
     }
 
     public void setLevelFour() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(192).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(193).withSlot(0));
     }
 
     public Command setVoltage(double power) {
