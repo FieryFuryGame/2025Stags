@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.EjectCoral;
+import frc.robot.commands.EjectCoralBack;
 import frc.robot.commands.LoadCoral;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -56,14 +57,14 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-        /*
+        
         NamedCommands.registerCommand("L1", Commands.runOnce(() -> elevator.setLevelOne()));
         NamedCommands.registerCommand("L2", Commands.runOnce(() -> elevator.setLevelTwo()));
         NamedCommands.registerCommand("L3", Commands.runOnce(() -> elevator.setLevelThree()));
         NamedCommands.registerCommand("L4", Commands.runOnce(() -> elevator.setLevelFour()));
         
-        NamedCommands.registerCommand("dispenseCoral", effector.runEffector());
-        */
+        NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
+        NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0));
 
         autoChooser = AutoBuilder.buildAutoChooser("Backup");
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -100,6 +101,8 @@ public class RobotContainer {
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-3)))
             .onFalse(elevator.setVoltage(0));
 
+        Constants.OperatorConstants.operatorController.leftBumper().onTrue(Commands.runOnce(() -> effector.useMotionMagic(9.4)));
+
         Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
         Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
         Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
@@ -107,6 +110,7 @@ public class RobotContainer {
 
         Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
         Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));
+        Constants.OperatorConstants.operatorController.x().whileTrue(new EjectCoralBack(effector));
         Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> new EffectorPivot(effector).execute()));
         
         drivetrain.registerTelemetry(logger::telemeterize);

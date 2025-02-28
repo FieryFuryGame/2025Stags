@@ -35,7 +35,7 @@ public class LoadCoral extends Command {
   public void execute() {
     if (m_effector.beamBreak.get()) {
       System.out.println("[Effector] Intaking");
-      m_effector.setWheelVoltage(-4.5);
+      m_effector.setWheelVoltage(-7);
     } else {
       m_effector.setWheelVoltage(0);
     }

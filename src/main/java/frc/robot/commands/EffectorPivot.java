@@ -34,13 +34,13 @@ public class EffectorPivot extends Command {
   @Override
   public void execute() {
     if (m_effector.pivotDown) {
-        m_effector.useMotionMagic(7);
+        m_effector.useMotionMagic(6);
         m_effector.pivotDown = false;
-        System.out.println("Pivot Down");
+        System.out.println("Pivot Up");
     } else {
         m_effector.useMotionMagic(0);
         m_effector.pivotDown = true;
-        System.out.println("Pivot Up");
+        System.out.println("Pivot Down");
     }
   }
 
