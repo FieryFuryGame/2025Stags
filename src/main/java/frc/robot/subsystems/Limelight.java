@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
-import frc.robot.LimelightHelpers.PoseEstimate;
 
 public class Limelight extends SubsystemBase {
 
@@ -39,9 +38,6 @@ public class Limelight extends SubsystemBase {
     NetworkTableEntry ty;
     NetworkTableEntry ta;
     public NetworkTableEntry tid;
-    PoseEstimate visionPoseEstimate;
-    double ThreeDRotationMeasurement;
-    double ThreeDDistanceMeasurement;
     public int teamAdd = 0;
     public int rotateDirection = 0;
     public int override = 6;
@@ -50,7 +46,7 @@ public class Limelight extends SubsystemBase {
 
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        4.0, 3.0,
+        6.0, 5.0,
         Units.degreesToRadians(540), Units.degreesToRadians(720));
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
@@ -129,12 +125,12 @@ public class Limelight extends SubsystemBase {
             if(id <= 11) {
                 PathPlannerPath path = PathPlannerPath.fromPathFile((id + 11) + getTriggerPressed(trigger));
                 path.preventFlipping = false;
-                System.out.println("[Pathfinder] Pathfinding to the " + trigger + " of AprilTag!");
+                System.out.println("[Pathfinder] Pathfinding to the " + trigger + " of AprilTag " + id + "!");
                 return path.mirrorPath();
             } else {
                 PathPlannerPath path = PathPlannerPath.fromPathFile(id + getTriggerPressed(trigger));
                 path.preventFlipping = false;
-                System.out.println("[Pathfinder] Pathfinding to the " + trigger + " of AprilTag!");
+                System.out.println("[Pathfinder] Pathfinding to the " + trigger + " of AprilTag " + id + "!");
                 return path;
             }
         } catch (Exception e) {
@@ -162,7 +158,6 @@ public class Limelight extends SubsystemBase {
         ty = table.getEntry("ty");
         ta = table.getEntry("ta");
         tid = table.getEntry("tid");
-        visionPoseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         
         
         SmartDashboard.putNumber("tr", MathUtil.inputModulus(pigeon2.getRotation2d().getDegrees() + teamAdd, 0,360));

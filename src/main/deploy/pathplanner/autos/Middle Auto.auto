@@ -15,15 +15,39 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "L2"
+                }
+              },
+              {
                 "type": "wait",
                 "data": {
-                  "waitTime": 3.0
+                  "waitTime": 1.7
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "dispenseCoral"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stopEffector"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L1"
                 }
               }
             ]

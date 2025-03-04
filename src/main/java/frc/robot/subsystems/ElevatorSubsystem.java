@@ -77,7 +77,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setLevelFour() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(194.3).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(196).withSlot(0));
     }
 
     public Command setVoltage(double power) {

@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -26,17 +28,21 @@ public class Robot extends TimedRobot {
 
   private final boolean kUseLimelight = true;
 
+  public Field2d field2d;
+
   Alert alert;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+    field2d = new Field2d();
+    SmartDashboard.putData("field", field2d);
     alert = new Alert("Loading Motivation-ish Framework...", AlertType.kInfo);
     alert.set(true);
   }
 
   public void motivationalQuotes() { // Joke we are doing for the drivers during testing.
     Random random = new Random();
-    int choice = random.nextInt(84) + 1;
+    int choice = random.nextInt(85) + 1;
     switch (choice) {
       // A missing semi-colon
       case 1:
@@ -294,6 +300,9 @@ public class Robot extends TimedRobot {
       case 84:
         alert.setText("So, does it work?");
         break;
+      case 85:
+        alert.setText("There is no way I share my DNA with a banana.");
+        break;
     }
   }
 
@@ -324,6 +333,8 @@ public class Robot extends TimedRobot {
         m_robotContainer.drivetrain.addVisionMeasurement(llMeasurement.pose, Utils.fpgaToCurrentTime(llMeasurement.timestampSeconds));
       }
     }
+
+    field2d.setRobotPose(m_robotContainer.drivetrain.getState().Pose);
   }
 
   @Override
@@ -344,6 +355,7 @@ public class Robot extends TimedRobot {
     }
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_robotContainer.limelight.checkAlliance();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();

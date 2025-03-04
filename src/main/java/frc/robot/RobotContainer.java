@@ -13,6 +13,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,16 +26,14 @@ import frc.robot.commands.EjectCoralBack;
 import frc.robot.commands.LoadCoral;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.DeepCage;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
-import frc.robot.subsystems.FloorIntake;
 import frc.robot.subsystems.Limelight;
 
 public class RobotContainer {
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private double MaxAngularRate = RotationsPerSecond.of(1.6).in(RadiansPerSecond); // 1.6 rotations per second max angular velocity
 
     PoseEstimate llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
@@ -45,12 +44,11 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
+    Field2d field2d = new Field2d();
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final ElevatorSubsystem elevator = new ElevatorSubsystem();
     public final EndEffector effector = new EndEffector();
-    // public final FloorIntake floorIntake = new FloorIntake();
-    // public final DeepCage deepCage = new DeepCage();
     public final Limelight limelight = new Limelight("limelight", drivetrain);
 
     /* Path follower */
@@ -65,6 +63,7 @@ public class RobotContainer {
         
         NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
         NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0));
+        NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));
 
         autoChooser = AutoBuilder.buildAutoChooser("Backup");
         SmartDashboard.putData("Auto Mode", autoChooser);
