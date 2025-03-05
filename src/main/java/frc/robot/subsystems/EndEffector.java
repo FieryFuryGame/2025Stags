@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 
 public class EndEffector extends SubsystemBase {
@@ -66,6 +67,10 @@ public class EndEffector extends SubsystemBase {
 
     public Command useMotionMagicCommand(double position) {
         return runOnce(() -> effectorPivot.setControl(positionVoltage.withPosition(position).withSlot(0)));
+    }
+
+    public Command intakeWithWait(double seconds, double power) {
+        return new WaitCommand(seconds).andThen(setWheelVoltageCommand(power));
     }
 
     public boolean isCoralLoaded() {

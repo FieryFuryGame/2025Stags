@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.EjectCoral;
-import frc.robot.commands.EjectCoralBack;
 import frc.robot.commands.LoadCoral;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -109,7 +108,6 @@ public class RobotContainer {
 
         Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
         Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));
-        Constants.OperatorConstants.operatorController.x().whileTrue(new EjectCoralBack(effector));
         Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> new EffectorPivot(effector).execute()));
         
         drivetrain.registerTelemetry(logger::telemeterize);
