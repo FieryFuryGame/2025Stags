@@ -62,6 +62,8 @@ public class RobotContainer {
         
         NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
         NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0));
+        NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
+        
         NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));
 
         autoChooser = AutoBuilder.buildAutoChooser("Backup");

@@ -355,7 +355,8 @@ public class Robot extends TimedRobot {
     }
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    m_robotContainer.limelight.checkAlliance();
+    LimelightHelpers.setPipelineIndex("limelight", 2); // Startup
+    // m_robotContainer.limelight.checkAlliance();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
