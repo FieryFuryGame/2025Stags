@@ -33,8 +33,7 @@ public class EjectCoral extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      System.out.println("[Effector] Algae");
-      m_effector.setWheelVoltage(6);
+      m_effector.setWheelVoltage(-12);
   }
 
   // Returns true when the command should end.
