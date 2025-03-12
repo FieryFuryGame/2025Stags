@@ -5,8 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.EndEffector;
 
 // import frc.robot.subsystems.CANLauncher;
@@ -14,11 +12,11 @@ import frc.robot.subsystems.EndEffector;
 /*This is an example of creating a command as a class. The base Command class provides a set of methods that your command
  * will override.
  */
-public class LoadCoral extends Command {
+public class LoadCoralAuto extends Command {
   EndEffector m_effector;
 
   /** Creates a new LaunchNote. */
-  public LoadCoral(EndEffector effector) {
+  public LoadCoralAuto(EndEffector effector) {
     // save the launcher system internally
     m_effector = effector;
 
@@ -37,12 +35,6 @@ public class LoadCoral extends Command {
   public void execute() {
     if (m_effector.beamBreak.get()) {
       m_effector.setWheelVoltage(-7);
-    } else {
-      new WaitCommand(0.2).andThen(Commands.runOnce(() ->
-      {
-        m_effector.setWheelVoltage(0);
-      })).schedule();
-      // m_effector.intakeWithWait(2, 0).andThen(Commands.runOnce(() -> end(false))).andThen(new PrintCommand("Woo!"));
     }
   }
 
@@ -55,7 +47,6 @@ public class LoadCoral extends Command {
   }
   @Override
   public void end(boolean interrupted) {
-    // Stop the wheels when the command ends.
-    m_effector.setWheelVoltage(0);
+    
   }
 }

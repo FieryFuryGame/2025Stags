@@ -151,7 +151,7 @@ public class Limelight extends SubsystemBase {
 
     @Override
     public void periodic() {
-        LimelightHelpers.SetRobotOrientation(name, pigeon2.getYaw().getValueAsDouble(), pigeon2.getAngularVelocityYWorld().getValueAsDouble(), 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation(name, drivetrain.getState().Pose.getRotation().getDegrees(), pigeon2.getAngularVelocityYWorld().getValueAsDouble(), 0, 0, 0, 0);
         
         tv = table.getEntry("tv");
         tx = table.getEntry("tx");

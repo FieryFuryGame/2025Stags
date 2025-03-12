@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -23,6 +25,7 @@ public class EndEffector extends SubsystemBase {
 
     MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
     public boolean pivotDown = true; // When turned on, the pivot should be down immediately.
+    public BooleanSupplier checkBeam = () -> !beamBreak.get();
     
     public EndEffector() {
         // This is very useful. Does a lot.

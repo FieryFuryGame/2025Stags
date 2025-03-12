@@ -80,6 +80,26 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorMotor.setControl(positionVoltage.withPosition(196).withSlot(0));
     }
 
+    public void setLevelAlgaeLow() {
+        elevatorMotor.stopMotor();
+        elevatorMotor.setControl(positionVoltage.withPosition(67).withSlot(0));
+    }
+    
+    public void setLevelAlgaeHigh() {
+        elevatorMotor.stopMotor();
+        elevatorMotor.setControl(positionVoltage.withPosition(113).withSlot(0));
+    }
+
+    public void setLevelAlgaeLowPrep() {
+        elevatorMotor.stopMotor();
+        elevatorMotor.setControl(positionVoltage.withPosition(79).withSlot(0));
+    }
+
+    public void setLevelAlgaeHighPrep() {
+        elevatorMotor.stopMotor();
+        elevatorMotor.setControl(positionVoltage.withPosition(125).withSlot(0));
+    }
+
     public Command setVoltage(double power) {
         return runOnce(() -> {
             elevatorMotor.setControl(voltageOut.withSlot(1).withVelocity(0).withFeedForward(-power));

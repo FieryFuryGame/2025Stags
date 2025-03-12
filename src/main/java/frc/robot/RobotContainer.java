@@ -19,10 +19,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.EjectCoral;
 import frc.robot.commands.LoadCoral;
+import frc.robot.commands.IntakeAlgae;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -61,6 +63,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("L4", Commands.runOnce(() -> elevator.setLevelFour()));
         
         NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
+        NamedCommands.registerCommand("waitForCoral", new WaitUntilCommand(effector.checkBeam));
+        NamedCommands.registerCommand("loadCoral", effector.setWheelVoltageCommand(-7).andThen());
         NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0));
         NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
         
@@ -101,7 +105,8 @@ public class RobotContainer {
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-3)))
             .onFalse(elevator.setVoltage(0));
 
-        Constants.OperatorConstants.operatorController.leftBumper().onTrue(Commands.runOnce(() -> effector.useMotionMagic(9.4)));
+        Constants.OperatorConstants.operatorController.leftBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeLowPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeLow()));
+        Constants.OperatorConstants.operatorController.rightBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeHighPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeHigh()));
 
         Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
         Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
@@ -110,6 +115,7 @@ public class RobotContainer {
 
         Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
         Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));
+        Constants.OperatorConstants.operatorController.x().whileTrue(new IntakeAlgae(effector));
         Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> new EffectorPivot(effector).execute()));
         
         drivetrain.registerTelemetry(logger::telemeterize);
