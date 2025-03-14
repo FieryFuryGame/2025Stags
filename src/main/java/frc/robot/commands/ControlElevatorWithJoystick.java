@@ -4,19 +4,28 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.FloorIntake;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.Constants;
 
-public class IntakeThroughFloor extends Command {
-  FloorIntake m_intake;
+// import frc.robot.subsystems.CANLauncher;
+
+/*This is an example of creating a command as a class. The base Command class provides a set of methods that your command
+ * will override.
+ */
+public class ControlElevatorWithJoystick extends Command {
+  ElevatorSubsystem m_elevator;
+  double m_power;
 
   /** Creates a new LaunchNote. */
-  public IntakeThroughFloor(FloorIntake intake) {
+  public ControlElevatorWithJoystick(ElevatorSubsystem elevator, double power) {
     // save the launcher system internally
-    m_intake = intake;
+    m_elevator = elevator;
+    m_power = power;
 
     // indicate that this command requires the launcher system
-    addRequirements(intake);
+    addRequirements(m_elevator);
   }
 
   // The initialize method is called when the command is initially scheduled.
@@ -28,17 +37,7 @@ public class IntakeThroughFloor extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_intake.beamBreakLeft.get() && m_intake.leftDown) {
-        m_intake.powerLeft(0);
-    } else {
-        m_intake.powerLeft(0);
-    }
-
-    if (m_intake.beamBreakRight.get() && m_intake.rightDown) {
-        m_intake.powerRight(0);
-    } else {
-        m_intake.powerLeft(0);
-    }
+    m_elevator.setVoltage(-MathUtil.applyDeadband(Constants.OperatorConstants.operatorController.getLeftY(), 0.1) * m_power);
   }
 
   // Returns true when the command should end.
@@ -50,7 +49,6 @@ public class IntakeThroughFloor extends Command {
   }
   @Override
   public void end(boolean interrupted) {
-    m_intake.powerLeft(0);
-    m_intake.powerRight(0);
+    m_elevator.setVoltage(0);
   }
 }

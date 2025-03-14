@@ -71,6 +71,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));
 
         autoChooser = AutoBuilder.buildAutoChooser("Backup");
+
         SmartDashboard.putData("Auto Mode", autoChooser);
 
         configureBindings();
@@ -104,6 +105,8 @@ public class RobotContainer {
             Constants.OperatorConstants.operatorController.rightTrigger()
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-3)))
             .onFalse(elevator.setVoltage(0));
+
+        // elevator.setDefaultCommand(new ControlElevatorWithJoystick(elevator));
 
         Constants.OperatorConstants.operatorController.leftBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeLowPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeLow()));
         Constants.OperatorConstants.operatorController.rightBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeHighPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeHigh()));
