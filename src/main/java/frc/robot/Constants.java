@@ -24,11 +24,12 @@ public final class Constants {
 
   public static class ElevatorConstants {
 
-    public static final int ElevatorMotorID = 10;
+    public static final int ElevatorMotorBID = 9;
+    public static final int ElevatorMotorAID = 10;
     // PID for motor B
     public static final double kS = 0.25, kV = 0.12, kA = 0.01, kP = 4.8, kI = 0, kD = 0.1, kG = 0.2;
     // Motion Magic Config B
-    public static final double mmCruiseVelocity = 600, mmAccel = 800, mmJerk = 1600;
+    public static final double mmCruiseVelocity = 80, mmAccel = 160, mmJerk = 1600;
   }
 
   public static class EndEffectorConstants {
@@ -39,23 +40,6 @@ public final class Constants {
     public static final double pivotkS = 0.25, pivotkV = 0.12, pivotkA = 0.01, pivotkP = 4.8, pivotkI = 0, pivotkD = 0.1;
     // Motion Magic Config B
     public static final double pivotmmCruiseVelocity = 80, pivotmmAccel = 160, pivotmmJerk = 1600;
-  }
-
-  public static class FloorIntakeConstants {
-    public static final int leftPivotMotorID = 13;
-    public static final int leftWheelsMotorID = 14;
-    public static final int rightPivotMotorID = 15;
-    public static final int rightWheelsMotorID = 16;
-
-    public static final double leftkS = 0.25, leftkV = 0.12, leftkA = 0.01, leftkP = 4.8, leftkI = 0, leftkD = 0.1;
-    public static final double rightkS = 0.25, rightkV = 0.12, rightkA = 0.01, rightkP = 4.8, rightkI = 0, rightkD = 0.1;
-
-    public static final double leftmmCruiseVelocity = 80, leftmmAccel = 160, leftmmJerk = 1600;
-    public static final double rightmmCruiseVelocity = 80, rightmmAccel = 160, rightmmJerk = 1600;
-  }
-
-  public static class DeepCageConstants {
-    public static final int deepCageMotorID = 17;
   }
 
   public static class TagConstants {

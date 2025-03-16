@@ -19,10 +19,10 @@ public class ControlElevatorWithJoystick extends Command {
   double m_power;
 
   /** Creates a new LaunchNote. */
-  public ControlElevatorWithJoystick(ElevatorSubsystem elevator, double power) {
+  public ControlElevatorWithJoystick(ElevatorSubsystem elevator, double maximumVoltage) {
     // save the launcher system internally
     m_elevator = elevator;
-    m_power = power;
+    m_power = maximumVoltage;
 
     // indicate that this command requires the launcher system
     addRequirements(m_elevator);

@@ -56,22 +56,21 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-        
+        // Elevator Commands
         NamedCommands.registerCommand("L1", Commands.runOnce(() -> elevator.setLevelOne()));
         NamedCommands.registerCommand("L2", Commands.runOnce(() -> elevator.setLevelTwo()));
         NamedCommands.registerCommand("L3", Commands.runOnce(() -> elevator.setLevelThree()));
         NamedCommands.registerCommand("L4", Commands.runOnce(() -> elevator.setLevelFour()));
-        
+        // Effector Commands
         NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
         NamedCommands.registerCommand("waitForCoral", new WaitUntilCommand(effector.checkBeam));
         NamedCommands.registerCommand("loadCoral", effector.setWheelVoltageCommand(-7).andThen());
         NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0));
         NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
-        
+        // Swerve Commands
         NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));
 
         autoChooser = AutoBuilder.buildAutoChooser("Backup");
-
         SmartDashboard.putData("Auto Mode", autoChooser);
 
         configureBindings();
@@ -100,21 +99,21 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         Constants.OperatorConstants.operatorController.leftTrigger()
-            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(3)))
+            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(2)))
             .onFalse(elevator.setVoltage(0));
             Constants.OperatorConstants.operatorController.rightTrigger()
-            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-3)))
+            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-2)))
             .onFalse(elevator.setVoltage(0));
 
         // elevator.setDefaultCommand(new ControlElevatorWithJoystick(elevator));
 
-        Constants.OperatorConstants.operatorController.leftBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeLowPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeLow()));
-        Constants.OperatorConstants.operatorController.rightBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeHighPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeHigh()));
+        // Constants.OperatorConstants.operatorController.leftBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeLowPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeLow()));
+        // Constants.OperatorConstants.operatorController.rightBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeHighPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeHigh()));
 
-        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
-        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
-        Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
-        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> elevator.setLevelOne()));
+        //Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
+        //Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
+        //Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
+        //Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> elevator.setLevelOne()));
 
         Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
         Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));

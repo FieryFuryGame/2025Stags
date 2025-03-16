@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -11,16 +12,21 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ElevatorSubsystem extends SubsystemBase {
     
-    TalonFX elevatorMotor = new TalonFX(Constants.ElevatorConstants.ElevatorMotorID, "Canivore");
+    TalonFX elevatorMotor = new TalonFX(Constants.ElevatorConstants.ElevatorMotorAID, "Canivore");
+    TalonFX elevatorMotorB = new TalonFX(Constants.ElevatorConstants.ElevatorMotorBID, "Canivore");
+    Follower followControl = new Follower(Constants.ElevatorConstants.ElevatorMotorAID, false);
 
     public ElevatorSubsystem() {
         setMotorSettings();
         elevatorMotor.setPosition(0.0, 1.0);
+        elevatorMotorB.setPosition(0.0, 1.0);
+        elevatorMotorB.setControl(followControl);
     }
     
     public void setMotorSettings() {
@@ -54,6 +60,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorMotor.getConfigurator().apply(motorSlot2);
         elevatorMotor.getConfigurator().apply(mmConfig);
         elevatorMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        elevatorMotorB.getConfigurator().apply(motorConfig);
+        elevatorMotorB.getConfigurator().apply(motorSlot);
+        elevatorMotorB.getConfigurator().apply(motorSlot2);
+        elevatorMotorB.getConfigurator().apply(mmConfig);
+        elevatorMotorB.setNeutralMode(NeutralModeValue.Brake);
     }
 
     // povUp L4, povLeft L3, povRight L2, povDown L1
@@ -68,36 +80,43 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setLevelTwo() {
         elevatorMotor.stopMotor();
         elevatorMotor.setControl(positionVoltage.withPosition(88).withSlot(0));
+        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 
     public void setLevelThree() {
         elevatorMotor.stopMotor();
         elevatorMotor.setControl(positionVoltage.withPosition(130).withSlot(0));
+        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 
     public void setLevelFour() {
         elevatorMotor.stopMotor();
         elevatorMotor.setControl(positionVoltage.withPosition(196).withSlot(0));
+        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 
     public void setLevelAlgaeLow() {
         elevatorMotor.stopMotor();
         elevatorMotor.setControl(positionVoltage.withPosition(67).withSlot(0));
+        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
     
     public void setLevelAlgaeHigh() {
         elevatorMotor.stopMotor();
         elevatorMotor.setControl(positionVoltage.withPosition(113).withSlot(0));
+        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 
     public void setLevelAlgaeLowPrep() {
         elevatorMotor.stopMotor();
         elevatorMotor.setControl(positionVoltage.withPosition(79).withSlot(0));
+        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 
     public void setLevelAlgaeHighPrep() {
         elevatorMotor.stopMotor();
         elevatorMotor.setControl(positionVoltage.withPosition(125).withSlot(0));
+        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 
     public Command setVoltage(double power) {
@@ -105,17 +124,21 @@ public class ElevatorSubsystem extends SubsystemBase {
             elevatorMotor.setControl(voltageOut.withSlot(1).withVelocity(0).withFeedForward(-power));
         });
     }
-    
+
     public Command stopElevator() {
-        return runOnce(() -> {
+        return Commands.runOnce(() -> {
             elevatorMotor.stopMotor();
+            elevatorMotorB.setControl(followControl);
         });
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("elevatorMotorPos", elevatorMotor.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("elevatorRPM", elevatorMotor.getRotorVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("elevatorAMotorPos", elevatorMotor.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("elevatorARPM", elevatorMotor.getRotorVelocity().getValueAsDouble());
+
+        SmartDashboard.putNumber("elevatorBMotorPos", elevatorMotorB.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("elevatorBRPM", elevatorMotorB.getRotorVelocity().getValueAsDouble());
     }
     
 
