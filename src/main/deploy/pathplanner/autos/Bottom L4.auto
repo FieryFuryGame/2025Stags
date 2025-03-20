@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top"
+            "pathName": "Bottom"
           }
         },
         {
@@ -86,7 +86,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top 2"
+            "pathName": "Bottom 2"
           }
         },
         {
@@ -130,7 +130,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top 3"
+            "pathName": "Bottom 3"
           }
         },
         {
@@ -209,7 +209,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top 4"
+            "pathName": "Bottom 4"
           }
         },
         {
@@ -253,7 +253,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top 5"
+            "pathName": "Bottom 5"
           }
         },
         {

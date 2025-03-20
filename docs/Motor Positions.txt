@@ -1,1 +1,7 @@
-L2 - 44 L3 - 67 L4 - 98.5
+L2 - 44
+L3 - 67.5
+L4 - 98.5
+L2 Algae Prep -
+L2 Algae Load -
+L3 Algae Prep -
+L3 Algae Load -

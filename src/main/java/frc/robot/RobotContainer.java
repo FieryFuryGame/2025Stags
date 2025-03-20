@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.EjectCoral;
@@ -64,8 +65,8 @@ public class RobotContainer {
         // Effector Commands
         NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
         NamedCommands.registerCommand("waitForCoral", new WaitUntilCommand(effector.checkBeam));
-        NamedCommands.registerCommand("loadCoral", effector.setWheelVoltageCommand(-7).andThen());
-        NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0));
+        NamedCommands.registerCommand("loadCoral", effector.setWheelVoltageCommand(-7).andThen(effector.setConveyorVoltageCommand(-6)));
+        NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0).andThen(effector.setConveyorVoltageCommand(0.0)));
         NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
         // Swerve Commands
         NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -89,6 +90,8 @@ public class RobotContainer {
             )
         );
 
+        Constants.OperatorConstants.driverController.povLeft().onTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
+
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
         Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Left").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
@@ -101,7 +104,7 @@ public class RobotContainer {
         Constants.OperatorConstants.operatorController.leftTrigger()
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(2)))
             .onFalse(elevator.setVoltage(0));
-            Constants.OperatorConstants.operatorController.rightTrigger()
+        Constants.OperatorConstants.operatorController.rightTrigger()
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-2)))
             .onFalse(elevator.setVoltage(0));
 
@@ -110,10 +113,10 @@ public class RobotContainer {
         // Constants.OperatorConstants.operatorController.leftBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeLowPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeLow()));
         // Constants.OperatorConstants.operatorController.rightBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeHighPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeHigh()));
 
-        //Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
-        //Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
-        //Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
-        //Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> elevator.setLevelOne()));
+        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
+        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
+        Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
+        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> elevator.setLevelOne()));
 
         Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
         Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));

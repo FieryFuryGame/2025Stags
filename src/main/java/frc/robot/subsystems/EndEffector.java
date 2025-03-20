@@ -14,13 +14,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 
 public class EndEffector extends SubsystemBase {
 
     TalonFX effectorWheels = new TalonFX(Constants.EndEffectorConstants.EffectorWheelsID, "Canivore");
     TalonFX effectorPivot = new TalonFX(Constants.EndEffectorConstants.EffectorPivotID, "Canivore");
+    TalonFX conveyor = new TalonFX(Constants.EndEffectorConstants.ConveyorID, "Canivore");
     public DigitalInput beamBreak = new DigitalInput(0);
 
     MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
@@ -28,7 +28,6 @@ public class EndEffector extends SubsystemBase {
     public BooleanSupplier checkBeam = () -> !beamBreak.get();
     
     public EndEffector() {
-        // This is very useful. Does a lot.
         setMotorSettings();
         effectorPivot.setPosition(0.0);
         effectorPivot.setControl(positionVoltage.withPosition(effectorPivot.getPosition().getValueAsDouble()).withSlot(0));
@@ -49,7 +48,7 @@ public class EndEffector extends SubsystemBase {
         MotionMagicConfigs mmpivotConfig = pivotConfig.MotionMagic;
         mmpivotConfig.MotionMagicCruiseVelocity = Constants.EndEffectorConstants.pivotmmCruiseVelocity;
         mmpivotConfig.MotionMagicAcceleration = Constants.EndEffectorConstants.pivotmmAccel;
-        // mmBConfig.MotionMagicJerk = Constants.ElevatorConstants.bmmJerk;
+        
         effectorPivot.getConfigurator().apply(pivotConfig);
         effectorPivot.getConfigurator().apply(mmpivotConfig);
         effectorPivot.setNeutralMode(NeutralModeValue.Brake);
@@ -63,6 +62,14 @@ public class EndEffector extends SubsystemBase {
     public void setWheelVoltage(double power) {
         effectorWheels.setVoltage(power);
     }
+    
+    public Command setConveyorVoltageCommand(double power) {
+        return runOnce(() -> conveyor.setVoltage(power));
+    }
+
+    public void setConveyorVoltage(double power) {
+        conveyor.setVoltage(power);
+    }
 
     public Command setPivotVoltage(double power) {
         return runOnce(() -> effectorPivot.setVoltage(power));
@@ -70,10 +77,6 @@ public class EndEffector extends SubsystemBase {
 
     public Command useMotionMagicCommand(double position) {
         return runOnce(() -> effectorPivot.setControl(positionVoltage.withPosition(position).withSlot(0)));
-    }
-
-    public Command intakeWithWait(double seconds, double power) {
-        return new WaitCommand(seconds).andThen(setWheelVoltageCommand(power));
     }
 
     public boolean isCoralLoaded() {
@@ -111,6 +114,7 @@ public class EndEffector extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("endEffectorPivotPos", effectorPivot.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("conveyorRPM", conveyor.getRotorVelocity().getValueAsDouble());
         SmartDashboard.putBoolean("coralLoadedInEffector", isCoralLoaded());
     }
     

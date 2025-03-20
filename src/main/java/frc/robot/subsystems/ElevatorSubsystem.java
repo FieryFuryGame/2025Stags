@@ -26,7 +26,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         setMotorSettings();
         elevatorMotor.setPosition(0.0, 1.0);
         elevatorMotorB.setPosition(0.0, 1.0);
-        elevatorMotorB.setControl(followControl);
     }
     
     public void setMotorSettings() {
@@ -49,7 +48,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         motorSlot2.kP = 0.0;
         motorSlot2.kI = 0.0;
         motorSlot2.kD = 0.0;
-        motorSlot2.kG = 0.2;
+        motorSlot2.kG = 0.3;
         
         MotionMagicConfigs mmConfig = motorConfig.MotionMagic;
         mmConfig.MotionMagicCruiseVelocity = Constants.ElevatorConstants.mmCruiseVelocity;
@@ -75,23 +74,25 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setLevelOne() {
         elevatorMotor.stopMotor();
         elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
+        elevatorMotorB.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 
     public void setLevelTwo() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(88).withSlot(0));
-        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(44).withSlot(0));
+        elevatorMotorB.setControl(positionVoltage.withPosition(44).withSlot(0));
     }
 
     public void setLevelThree() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(130).withSlot(0));
-        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(67.5).withSlot(0));
+        elevatorMotorB.setControl(positionVoltage.withPosition(67.5).withSlot(0));
     }
 
     public void setLevelFour() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(196).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(98.5).withSlot(0));
+        elevatorMotorB.setControl(positionVoltage.withPosition(98.5).withSlot(0));
         //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 
@@ -116,19 +117,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setLevelAlgaeHighPrep() {
         elevatorMotor.stopMotor();
         elevatorMotor.setControl(positionVoltage.withPosition(125).withSlot(0));
-        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 
     public Command setVoltage(double power) {
         return runOnce(() -> {
             elevatorMotor.setControl(voltageOut.withSlot(1).withVelocity(0).withFeedForward(-power));
+            elevatorMotorB.setControl(voltageOut.withSlot(1).withVelocity(0).withFeedForward(-power));
         });
     }
 
     public Command stopElevator() {
         return Commands.runOnce(() -> {
             elevatorMotor.stopMotor();
-            elevatorMotorB.setControl(followControl);
+            elevatorMotorB.stopMotor();
         });
     }
 

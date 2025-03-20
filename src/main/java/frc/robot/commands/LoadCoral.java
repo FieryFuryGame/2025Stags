@@ -37,12 +37,13 @@ public class LoadCoral extends Command {
   public void execute() {
     if (m_effector.beamBreak.get()) {
       m_effector.setWheelVoltage(-7);
+      m_effector.setConveyorVoltage(-6);
     } else {
       new WaitCommand(0.2).andThen(Commands.runOnce(() ->
       {
         m_effector.setWheelVoltage(0);
+        m_effector.setConveyorVoltage(0);
       })).schedule();
-      // m_effector.intakeWithWait(2, 0).andThen(Commands.runOnce(() -> end(false))).andThen(new PrintCommand("Woo!"));
     }
   }
 
@@ -53,9 +54,11 @@ public class LoadCoral extends Command {
     // scheduler to end the command when the button is released.
     return false;
   }
+  
   @Override
   public void end(boolean interrupted) {
     // Stop the wheels when the command ends.
     m_effector.setWheelVoltage(0);
+    m_effector.setConveyorVoltage(0);
   }
 }

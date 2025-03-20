@@ -17,13 +17,25 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L2"
+                  "name": "L4"
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.7
+                  "waitTime": 4.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotEffector"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.5
                 }
               },
               {
@@ -35,13 +47,25 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.5
+                  "waitTime": 1.5
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "stopEffector"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotEffector"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
                 }
               },
               {

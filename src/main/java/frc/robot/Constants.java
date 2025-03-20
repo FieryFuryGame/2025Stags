@@ -27,18 +27,18 @@ public final class Constants {
     public static final int ElevatorMotorBID = 9;
     public static final int ElevatorMotorAID = 10;
     // PID for motor B
-    public static final double kS = 0.25, kV = 0.12, kA = 0.01, kP = 4.8, kI = 0, kD = 0.1, kG = 0.2;
+    public static final double kS = 0.25, kV = 0.12, kA = 0.01, kP = 4.8, kI = 0, kD = 0.1, kG = 0.3;
     // Motion Magic Config B
-    public static final double mmCruiseVelocity = 80, mmAccel = 160, mmJerk = 1600;
+    public static final double mmCruiseVelocity = 140, mmAccel = 280, mmJerk = 1600;
   }
 
   public static class EndEffectorConstants {
     public static final int EffectorWheelsID = 11;
-
     public static final int EffectorPivotID = 12;
-    // PID for motor B
+    public static final int ConveyorID = 13;
+    // PID for Pivot
     public static final double pivotkS = 0.25, pivotkV = 0.12, pivotkA = 0.01, pivotkP = 4.8, pivotkI = 0, pivotkD = 0.1;
-    // Motion Magic Config B
+    // Pivot Motion Magic Config
     public static final double pivotmmCruiseVelocity = 80, pivotmmAccel = 160, pivotmmJerk = 1600;
   }
 

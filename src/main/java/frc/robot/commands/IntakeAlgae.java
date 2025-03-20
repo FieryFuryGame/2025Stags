@@ -34,6 +34,7 @@ public class IntakeAlgae extends Command {
   @Override
   public void execute() {
       m_effector.setWheelVoltage(6);
+      m_effector.setConveyorVoltage(6);
   }
 
   // Returns true when the command should end.
@@ -47,5 +48,6 @@ public class IntakeAlgae extends Command {
   public void end(boolean interrupted) {
     // Stop the wheels when the command ends.
     m_effector.setWheelVoltage(0);
+    m_effector.setConveyorVoltage(0);
   }
 }
