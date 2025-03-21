@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top"
+            "pathName": "Bottom"
           }
         },
         {
@@ -17,13 +17,38 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L3"
+                  "name": "L4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "waitForL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.4
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotEffector"
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
+                  "waitTime": 0.6
                 }
               },
               {
@@ -35,7 +60,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.5
+                  "waitTime": 1.0
                 }
               },
               {
@@ -47,13 +72,32 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L1"
+                  "name": "pivotEffector"
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
+                  "waitTime": 0.7
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "L1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "waitForL1"
                 }
               }
             ]
@@ -62,7 +106,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top 2"
+            "pathName": "Bottom 2"
           }
         },
         {
@@ -91,7 +135,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.24
+                  "waitTime": 0.2
                 }
               },
               {
@@ -106,7 +150,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top 3"
+            "pathName": "Bottom 3"
           }
         },
         {
@@ -116,13 +160,38 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L3"
+                  "name": "L4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "waitForL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.4
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotEffector"
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
+                  "waitTime": 0.6
                 }
               },
               {
@@ -134,7 +203,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.5
+                  "waitTime": 1.0
                 }
               },
               {
@@ -146,66 +215,16 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L1"
+                  "name": "pivotEffector"
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
+                  "waitTime": 0.7
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Top 4"
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "loadCoral"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "waitForCoral"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.24
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopEffector"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Top 5"
           }
         },
         {
@@ -216,42 +235,6 @@
                 "type": "named",
                 "data": {
                   "name": "L3"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 4.0
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "dispenseCoral"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.5
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopEffector"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L1"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 4.0
                 }
               }
             ]

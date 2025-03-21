@@ -20,13 +20,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.EjectCoral;
 import frc.robot.commands.LoadCoral;
 import frc.robot.commands.IntakeAlgae;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
@@ -52,6 +52,7 @@ public class RobotContainer {
     public final ElevatorSubsystem elevator = new ElevatorSubsystem();
     public final EndEffector effector = new EndEffector();
     public final Limelight limelight = new Limelight("limelight", drivetrain);
+    public final Climber climber = new Climber();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -62,15 +63,20 @@ public class RobotContainer {
         NamedCommands.registerCommand("L2", Commands.runOnce(() -> elevator.setLevelTwo()));
         NamedCommands.registerCommand("L3", Commands.runOnce(() -> elevator.setLevelThree()));
         NamedCommands.registerCommand("L4", Commands.runOnce(() -> elevator.setLevelFour()));
+        NamedCommands.registerCommand("waitForL1", new WaitUntilCommand(elevator.isL4));
+        NamedCommands.registerCommand("waitForL4", new WaitUntilCommand(elevator.isL4));
+
         // Effector Commands
         NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
         NamedCommands.registerCommand("waitForCoral", new WaitUntilCommand(effector.checkBeam));
         NamedCommands.registerCommand("loadCoral", effector.setWheelVoltageCommand(-7).andThen(effector.setConveyorVoltageCommand(-6)));
         NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0).andThen(effector.setConveyorVoltageCommand(0.0)));
         NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
+
         // Swerve Commands
         NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));
 
+        // Auto Selection
         autoChooser = AutoBuilder.buildAutoChooser("Backup");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -82,7 +88,7 @@ public class RobotContainer {
         // and Y is defined as to the left according to WPILib convention.
 
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
+            // Drive and steer stuff
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
@@ -90,39 +96,39 @@ public class RobotContainer {
             )
         );
 
-        Constants.OperatorConstants.driverController.povLeft().onTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
-
+        // Point wheels towards center
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
+        // Pathfinding control
         Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Left").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
         Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Right").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
         Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Center").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
         
+        // Miscellaneous
         Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
         Constants.OperatorConstants.driverController.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
+        // Elevator Manual Control
         Constants.OperatorConstants.operatorController.leftTrigger()
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(2)))
             .onFalse(elevator.setVoltage(0));
         Constants.OperatorConstants.operatorController.rightTrigger()
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-2)))
             .onFalse(elevator.setVoltage(0));
-
-        // elevator.setDefaultCommand(new ControlElevatorWithJoystick(elevator));
-
-        // Constants.OperatorConstants.operatorController.leftBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeLowPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeLow()));
-        // Constants.OperatorConstants.operatorController.rightBumper().onTrue(Commands.runOnce(() -> elevator.setLevelAlgaeHighPrep())).onFalse(Commands.runOnce(() -> elevator.setLevelAlgaeHigh()));
-
+        
+        // Elevator Automatic Control    
         Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
         Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
         Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
         Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> elevator.setLevelOne()));
 
+        // Effector Controls
         Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
         Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));
         Constants.OperatorConstants.operatorController.x().whileTrue(new IntakeAlgae(effector));
         Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> new EffectorPivot(effector).execute()));
         
+        // Fancy logging stuff that fills all the storage on the RIO
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 

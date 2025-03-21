@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
@@ -21,6 +23,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     TalonFX elevatorMotor = new TalonFX(Constants.ElevatorConstants.ElevatorMotorAID, "Canivore");
     TalonFX elevatorMotorB = new TalonFX(Constants.ElevatorConstants.ElevatorMotorBID, "Canivore");
     Follower followControl = new Follower(Constants.ElevatorConstants.ElevatorMotorAID, false);
+    
+    public BooleanSupplier isL1 = () -> elevatorMotor.getPosition().getValueAsDouble() < 2;
+    public BooleanSupplier isL4 = () -> elevatorMotor.getPosition().getValueAsDouble() > 96.5;
 
     public ElevatorSubsystem() {
         setMotorSettings();
@@ -91,8 +96,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setLevelFour() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(98.5).withSlot(0));
-        elevatorMotorB.setControl(positionVoltage.withPosition(98.5).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(98).withSlot(0));
+        elevatorMotorB.setControl(positionVoltage.withPosition(98).withSlot(0));
         //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
     }
 

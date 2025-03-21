@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Middle"
+            "pathName": "Bottom"
           }
         },
         {
@@ -21,9 +21,22 @@
                 }
               },
               {
+                "type": "named",
+                "data": {
+                  "name": "waitForL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
+                  "waitTime": 0.4
                 }
               },
               {
@@ -35,7 +48,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.5
+                  "waitTime": 0.6
                 }
               },
               {
@@ -47,7 +60,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.5
+                  "waitTime": 1.0
                 }
               },
               {
@@ -65,13 +78,20 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
+                  "waitTime": 0.7
                 }
-              },
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "L1"
+                  "name": "L3"
                 }
               }
             ]
