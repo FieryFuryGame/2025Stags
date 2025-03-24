@@ -22,6 +22,7 @@ public class Climber extends SubsystemBase {
     TalonFX motorB = new TalonFX(Constants.ClimberConstants.ClimberMotorB, "Canivore");
     
     public Climber() {
+        setMotorSettings();
         motorA.setPosition(0);
         motorB.setPosition(0);
         motorB.setControl(new Follower(Constants.ClimberConstants.ClimberMotorA, true));
@@ -71,7 +72,7 @@ public class Climber extends SubsystemBase {
 
     public void setVoltage(double power) {
         motorA.setControl(voltageOut.withSlot(1).withVelocity(0).withFeedForward(-power));
-        motorB.setControl(voltageOut.withSlot(1).withVelocity(0).withFeedForward(-power));
+        motorB.setControl(voltageOut.withSlot(1).withVelocity(0).withFeedForward(power));
     }
 
     public Command setVoltageCommand(double power) {

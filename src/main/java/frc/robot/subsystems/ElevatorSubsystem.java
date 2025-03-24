@@ -25,7 +25,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     Follower followControl = new Follower(Constants.ElevatorConstants.ElevatorMotorAID, false);
     
     public BooleanSupplier isL1 = () -> elevatorMotor.getPosition().getValueAsDouble() < 2;
-    public BooleanSupplier isL4 = () -> elevatorMotor.getPosition().getValueAsDouble() > 96.5;
+    public BooleanSupplier isL4 = () -> elevatorMotor.getPosition().getValueAsDouble() > 96.75;
 
     public ElevatorSubsystem() {
         setMotorSettings();
@@ -84,21 +84,20 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setLevelTwo() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(44).withSlot(0));
-        elevatorMotorB.setControl(positionVoltage.withPosition(44).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(42).withSlot(0));
+        elevatorMotorB.setControl(positionVoltage.withPosition(42).withSlot(0));
     }
 
     public void setLevelThree() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(67.5).withSlot(0));
-        elevatorMotorB.setControl(positionVoltage.withPosition(67.5).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(66).withSlot(0));
+        elevatorMotorB.setControl(positionVoltage.withPosition(66).withSlot(0));
     }
 
     public void setLevelFour() {
         elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(98).withSlot(0));
-        elevatorMotorB.setControl(positionVoltage.withPosition(98).withSlot(0));
-        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
+        elevatorMotor.setControl(positionVoltage.withPosition(98.5).withSlot(0));
+        elevatorMotorB.setControl(positionVoltage.withPosition(98.5).withSlot(0));
     }
 
     public void setLevelAlgaeLow() {

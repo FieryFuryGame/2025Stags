@@ -226,19 +226,6 @@
               }
             ]
           }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L3"
-                }
-              }
-            ]
-          }
         }
       ]
     }

@@ -52,7 +52,7 @@ public class RobotContainer {
     public final ElevatorSubsystem elevator = new ElevatorSubsystem();
     public final EndEffector effector = new EndEffector();
     public final Limelight limelight = new Limelight("limelight", drivetrain);
-    public final Climber climber = new Climber();
+    // public final Climber climber = new Climber();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -107,7 +107,18 @@ public class RobotContainer {
         // Miscellaneous
         Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
         Constants.OperatorConstants.driverController.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        /*
+        Constants.OperatorConstants.driverController.povDown().onTrue(climber.moveToSetpointCommand(0.0)); // Initial Position
+        Constants.OperatorConstants.driverController.povLeft().onTrue(climber.moveToSetpointCommand(0.0)); // Preparing Position
+        Constants.OperatorConstants.driverController.povRight().onTrue(climber.moveToSetpointCommand(0.0)); // Raising Position
 
+        Constants.OperatorConstants.driverController.leftTrigger()
+            .onTrue(climber.setVoltageCommand(12))
+            .onFalse(climber.setVoltageCommand(0));
+        Constants.OperatorConstants.driverController.rightTrigger()
+            .onTrue(climber.setVoltageCommand(-12))
+            .onFalse(climber.setVoltageCommand(0));
+        */
         // Elevator Manual Control
         Constants.OperatorConstants.operatorController.leftTrigger()
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(2)))
