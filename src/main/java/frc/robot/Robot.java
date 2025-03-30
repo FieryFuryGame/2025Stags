@@ -4,16 +4,13 @@
 
 package frc.robot;
 
-import java.util.Optional;
 import java.util.Random;
 
-import com.ctre.phoenix6.Utils;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -25,8 +22,6 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
-
-  private final boolean kUseLimelight = true;
 
   public Field2d field2d;
 
@@ -319,13 +314,6 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    if (kUseLimelight) {
-      var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-      if (llMeasurement != null && llMeasurement.tagCount > 0) {
-        m_robotContainer.drivetrain.addVisionMeasurement(llMeasurement.pose, Utils.fpgaToCurrentTime(llMeasurement.timestampSeconds));
-      }
-    }
-
     field2d.setRobotPose(m_robotContainer.drivetrain.getState().Pose);
   }
 
@@ -342,12 +330,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    if(DriverStation.getAlliance().equals(Optional.of(DriverStation.Alliance.Red))) {
-      m_robotContainer.limelight.teamAdd = 180;
-    } else {
-      m_robotContainer.limelight.teamAdd = 0;
-    }
-
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     LimelightHelpers.setPipelineIndex("limelight", 2); // Startup
     // m_robotContainer.limelight.checkAlliance();
@@ -365,14 +347,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    if(DriverStation.getAlliance().equals(Optional.of(DriverStation.Alliance.Red))) {
-      m_robotContainer.limelight.teamAdd = 180;
-    } else {
-      m_robotContainer.limelight.teamAdd = 0;
-    }
-
-    m_robotContainer.limelight.checkAlliance();
-    
     motivationalQuotes();
 
     if (m_autonomousCommand != null) {

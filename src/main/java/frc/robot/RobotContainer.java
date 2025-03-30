@@ -30,7 +30,7 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
-import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.PhotonSim;
 
 public class RobotContainer {
 
@@ -40,7 +40,11 @@ public class RobotContainer {
     PoseEstimate llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
     /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+    private final SwerveRequest.FieldCentric fieldDrive = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
+    private final SwerveRequest.RobotCentric robotDrive = new SwerveRequest.RobotCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -51,8 +55,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final ElevatorSubsystem elevator = new ElevatorSubsystem();
     public final EndEffector effector = new EndEffector();
-    public final Limelight limelight = new Limelight("limelight", drivetrain);
     public final Climber climber = new Climber();
+    public final PhotonSim photonSim = new PhotonSim(drivetrain);
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -90,9 +94,17 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drive and steer stuff
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
+                fieldDrive.withVelocityX(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-MathUtil.applyDeadband(Constants.OperatorConstants.driverController.getRightX(), 0.1) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            )
+        );
+
+        Constants.OperatorConstants.driverController.leftTrigger().whileTrue(
+            drivetrain.applyRequest(() -> robotDrive
+                    .withVelocityX(-Constants.OperatorConstants.driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y(forward)
+                    .withVelocityY(-Constants.OperatorConstants.driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-Constants.OperatorConstants.driverController.getRightX() * MaxAngularRate)
             )
         );
 
@@ -100,9 +112,9 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
         // Pathfinding control
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Left").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
-        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Right").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
-        Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Center").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> photonSim.pathfindWithPath("Left").schedule()).unless(() -> photonSim.tid <= 0));
+        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> photonSim.pathfindWithPath("Right").schedule()).unless(() -> photonSim.tid <= 0));
+        Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> photonSim.pathfindWithPath("Center").schedule()).unless(() -> photonSim.tid <= 0));
         
         // Miscellaneous
         Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
