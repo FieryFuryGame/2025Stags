@@ -64,6 +64,8 @@ public class PhotonSim extends SubsystemBase {
         Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(0), 0);
         Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
 
+        cameraSim.enableDrawWireframe(true);
+
         visionSim.addCamera(cameraSim, robotToCamera);
     }
 
