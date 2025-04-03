@@ -24,6 +24,9 @@ import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.EjectCoral;
 import frc.robot.commands.LoadCoral;
+import frc.robot.commands.SimulatePlacingCoralL2;
+import frc.robot.commands.SimulatePlacingCoralL3;
+import frc.robot.commands.SimulatePlacingCoralL4;
 import frc.robot.commands.IntakeAlgae;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
@@ -63,7 +66,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("L1", Commands.runOnce(() -> elevator.setLevelOne()));
         NamedCommands.registerCommand("L2", Commands.runOnce(() -> elevator.setLevelTwo()));
         NamedCommands.registerCommand("L3", Commands.runOnce(() -> elevator.setLevelThree()));
-        NamedCommands.registerCommand("L4", Commands.runOnce(() -> elevator.setLevelFour()));
+        NamedCommands.registerCommand("L4", new SimulatePlacingCoralL4(drivetrain, effector));
         NamedCommands.registerCommand("waitForL1", new WaitUntilCommand(elevator.isL4));
         NamedCommands.registerCommand("waitForL4", new WaitUntilCommand(elevator.isL4));
 
@@ -78,7 +81,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));
 
         // Auto Selection
-        autoChooser = AutoBuilder.buildAutoChooser("Backup");
+        autoChooser = AutoBuilder.buildAutoChooser("Top 2 L4");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
         configureBindings();
@@ -118,10 +121,9 @@ public class RobotContainer {
             .onFalse(elevator.setVoltage(0));
         
         // Elevator Automatic Control    
-        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
-        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
-        Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
-        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> elevator.setLevelOne()));
+        Constants.OperatorConstants.driverController.povUp().onTrue(new SimulatePlacingCoralL3(drivetrain, effector));
+        Constants.OperatorConstants.driverController.povLeft().onTrue(new SimulatePlacingCoralL2(drivetrain, effector));
+        Constants.OperatorConstants.driverController.povRight().onTrue(new SimulatePlacingCoralL4(drivetrain, effector));
 
         // Effector Controls
         Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
