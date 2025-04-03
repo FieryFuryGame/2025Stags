@@ -35,7 +35,17 @@ public class SimulatePlacingCoralL3 extends Command {
   public SimulatePlacingCoralL3(CommandSwerveDrivetrain drivetrain, EndEffector effector) {
     this.drivetrain = drivetrain;
     this.effector = effector;
-
+    
+    branchRobotPositions.add(new Pose2d(3.95, 4.63, Rotation2d.fromDegrees(60)));
+    branchRobotPositions.add(new Pose2d(4.232, 4.78, Rotation2d.fromDegrees(60)));
+    branchRobotPositions.add(new Pose2d(4.735, 4.810, Rotation2d.fromDegrees(0)));
+    branchRobotPositions.add(new Pose2d(5.023, 4.631, Rotation2d.fromDegrees(0)));
+    branchRobotPositions.add(new Pose2d(5.3, 4.2, Rotation2d.fromDegrees(-60)));
+    branchRobotPositions.add(new Pose2d(5.3, 3.875, Rotation2d.fromDegrees(-60)));
+    branchRobotPositions.add(new Pose2d(5.035, 3.396, Rotation2d.fromDegrees(-120)));
+    branchRobotPositions.add(new Pose2d(4.759, 3.264, Rotation2d.fromDegrees(-120)));
+    branchRobotPositions.add(new Pose2d(4.220, 3.228, Rotation2d.fromDegrees(180)));
+    branchRobotPositions.add(new Pose2d(3.908, 3.396, Rotation2d.fromDegrees(180)));
     branchRobotPositions.add(new Pose2d(3.7, 3.863, Rotation2d.fromDegrees(120)));
     branchRobotPositions.add(new Pose2d(3.7, 4.2, Rotation2d.fromDegrees(120)));
 
@@ -44,6 +54,40 @@ public class SimulatePlacingCoralL3 extends Command {
 
   public Pose2d getNearestBranch() {
     return drivetrain.getState().Pose.nearest(branchRobotPositions);
+  }
+
+  public Rotation3d getRotationAngle() {
+    double roll = 0;
+    double pitch = 0;
+    double yaw = 0;
+    System.out.println(nearestPose.getRotation().getDegrees());
+    switch ((int) nearestPose.getRotation().getDegrees()) {
+      case 119:
+        pitch = Units.degreesToRadians(30); // Front Middle
+        break;
+      case 59:
+        pitch = Units.degreesToRadians(-30); // Front Left
+        yaw = Units.degreesToRadians(120);
+        break;
+      case 0:
+        pitch = Units.degreesToRadians(-30); // Back Right
+        yaw = Units.degreesToRadians(60);
+        break;
+      case -59:
+        pitch = Units.degreesToRadians(-30); // Back Middle
+        break;
+      case -119:
+        pitch = Units.degreesToRadians(-30); // Back Left
+        yaw = Units.degreesToRadians(-60);
+        break;
+      case 180:
+        pitch = Units.degreesToRadians(-30); // Front Right
+        yaw = Units.degreesToRadians(-120);
+        break;
+      default:
+        break;
+    }
+    return new Rotation3d(roll, pitch, yaw);
   }
 
   // The initialize method is called when the command is initially scheduled.
@@ -56,10 +100,13 @@ public class SimulatePlacingCoralL3 extends Command {
   @Override
   public void execute() {
     coralPose = new Pose3d(getNearestBranch());
-    Rotation3d rotation = new Rotation3d(0, Units.degreesToRadians(25), 0);
-    double[] coralPoseArray = {coralPose.getX(), coralPose.getY(), 1.2, rotation.getAngle(), rotation.getX(), rotation.getY(), rotation.getZ()};
-    SmartDashboard.putNumberArray(Integer.toString(branchID), coralPoseArray);
+    Rotation3d rotation = getRotationAngle();
+    double[] coralPoseArray = {coralPose.getX(), coralPose.getY(), 1.2, rotation.getQuaternion().getW(), rotation.getQuaternion().getX(), rotation.getQuaternion().getY(), rotation.getQuaternion().getZ()};
     canPlace = true;
+    if (effector.simulatedBeamBreak) {
+      SmartDashboard.putNumberArray(Integer.toString(branchID), coralPoseArray);
+      effector.simulatedBeamBreak = false;
+    }
   }
 
   // Returns true when the command should end.

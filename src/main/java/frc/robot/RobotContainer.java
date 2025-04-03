@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.EjectCoral;
+import frc.robot.commands.GetDistanceFromStation;
 import frc.robot.commands.LoadCoral;
 import frc.robot.commands.SimulatePlacingCoralL2;
 import frc.robot.commands.SimulatePlacingCoralL3;
@@ -47,7 +48,6 @@ public class RobotContainer {
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
     Field2d field2d = new Field2d();
@@ -73,7 +73,7 @@ public class RobotContainer {
         // Effector Commands
         NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
         NamedCommands.registerCommand("waitForCoral", new WaitUntilCommand(effector.checkBeam));
-        NamedCommands.registerCommand("loadCoral", effector.setWheelVoltageCommand(-7).andThen(effector.setConveyorVoltageCommand(-6)));
+        NamedCommands.registerCommand("loadCoral", new GetDistanceFromStation(drivetrain, effector));
         NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0).andThen(effector.setConveyorVoltageCommand(0.0)));
         NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
 
@@ -101,7 +101,7 @@ public class RobotContainer {
         );
 
         // Point wheels towards center
-        Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
+        Constants.OperatorConstants.driverController.b().onTrue(new GetDistanceFromStation(drivetrain, effector));
 
         // Pathfinding control
         Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> photonSim.pathfindWithPath("Left").schedule()).unless(() -> photonSim.tid <= 0));

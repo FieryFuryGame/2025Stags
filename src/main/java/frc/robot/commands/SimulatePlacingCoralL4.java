@@ -68,8 +68,11 @@ public class SimulatePlacingCoralL4 extends Command {
     coralPose = new Pose3d(getNearestBranch());
     Rotation3d rotation = new Rotation3d(0, Units.degreesToRadians(90), 0);
     double[] coralPoseArray = {coralPose.getX(), coralPose.getY(), 1.7, rotation.getAngle(), rotation.getX(), rotation.getY(), rotation.getZ()};
-    SmartDashboard.putNumberArray(Integer.toString(branchID), coralPoseArray);
     canPlace = true;
+    if (effector.simulatedBeamBreak) {
+      SmartDashboard.putNumberArray(Integer.toString(branchID), coralPoseArray);
+      effector.simulatedBeamBreak = false;
+    }
   }
 
   // Returns true when the command should end.

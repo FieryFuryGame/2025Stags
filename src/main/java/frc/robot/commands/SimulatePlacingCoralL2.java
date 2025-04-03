@@ -56,6 +56,40 @@ public class SimulatePlacingCoralL2 extends Command {
     return drivetrain.getState().Pose.nearest(branchRobotPositions);
   }
 
+  public Rotation3d getRotationAngle() {
+    double roll = 0;
+    double pitch = 0;
+    double yaw = 0;
+    System.out.println(nearestPose.getRotation().getDegrees());
+    switch ((int) nearestPose.getRotation().getDegrees()) {
+      case 119:
+        pitch = Units.degreesToRadians(30); // Front Middle
+        break;
+      case 59:
+        pitch = Units.degreesToRadians(-30); // Front Left
+        yaw = Units.degreesToRadians(120);
+        break;
+      case 0:
+        pitch = Units.degreesToRadians(-30); // Back Right
+        yaw = Units.degreesToRadians(60);
+        break;
+      case -59:
+        pitch = Units.degreesToRadians(-30); // Back Middle
+        break;
+      case -119:
+        pitch = Units.degreesToRadians(-30); // Back Left
+        yaw = Units.degreesToRadians(-60);
+        break;
+      case 180:
+        pitch = Units.degreesToRadians(-30); // Front Right
+        yaw = Units.degreesToRadians(-120);
+        break;
+      default:
+        break;
+    }
+    return new Rotation3d(roll, pitch, yaw);
+  }
+
   // The initialize method is called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -66,10 +100,13 @@ public class SimulatePlacingCoralL2 extends Command {
   @Override
   public void execute() {
     coralPose = new Pose3d(getNearestBranch());
-    Rotation3d rotation = new Rotation3d(0, Units.degreesToRadians(25), 0);
-    double[] coralPoseArray = {coralPose.getX(), coralPose.getY(), 0.77, rotation.getAngle(), rotation.getX(), rotation.getY(), rotation.getZ()};
-    SmartDashboard.putNumberArray(Integer.toString(branchID), coralPoseArray);
+    Rotation3d rotation = getRotationAngle();
+    double[] coralPoseArray = {coralPose.getX(), coralPose.getY(), 0.77, rotation.getQuaternion().getW(), rotation.getQuaternion().getX(), rotation.getQuaternion().getY(), rotation.getQuaternion().getZ()};
     canPlace = true;
+    if (effector.simulatedBeamBreak) {
+      SmartDashboard.putNumberArray(Integer.toString(branchID), coralPoseArray);
+      effector.simulatedBeamBreak = false;
+    }
   }
 
   // Returns true when the command should end.

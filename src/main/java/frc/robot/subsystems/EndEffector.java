@@ -25,6 +25,8 @@ public class EndEffector extends SubsystemBase {
     MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
     public boolean pivotDown = true; // When turned on, the pivot should be down immediately.
     public BooleanSupplier checkBeam = () -> !beamBreak.get();
+
+    public boolean simulatedBeamBreak = true;
     
     public EndEffector() {
         setMotorSettings();
@@ -114,7 +116,7 @@ public class EndEffector extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("endEffectorPivotPos", effectorPivot.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("conveyorRPM", conveyor.getRotorVelocity().getValueAsDouble());
-        SmartDashboard.putBoolean("coralLoadedInEffector", isCoralLoaded());
+        SmartDashboard.putBoolean("coralLoadedInEffector", simulatedBeamBreak);
 
     }
     
