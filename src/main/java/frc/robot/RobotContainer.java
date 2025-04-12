@@ -21,19 +21,17 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.commands.DecideWhereToPlaceCoral;
 import frc.robot.commands.EffectorPivot;
-import frc.robot.commands.EjectCoral;
-import frc.robot.commands.GetDistanceFromStation;
-import frc.robot.commands.LoadCoral;
-import frc.robot.commands.SimulatePlacingCoralL2;
-import frc.robot.commands.SimulatePlacingCoralL3;
+import frc.robot.commands.SimulateCoralIntake;
 import frc.robot.commands.SimulatePlacingCoralL4;
-import frc.robot.commands.IntakeAlgae;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ElevatorSim;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
+import frc.robot.subsystems.EndEffectorSim;
 import frc.robot.subsystems.PhotonSim;
 
 public class RobotContainer {
@@ -57,23 +55,26 @@ public class RobotContainer {
     public final EndEffector effector = new EndEffector();
     public final Climber climber = new Climber();
     public final PhotonSim photonSim = new PhotonSim(drivetrain);
+    public final ElevatorSim elevatorSim = new ElevatorSim();
+    public final EndEffectorSim effectorSim = new EndEffectorSim(effector, elevatorSim, drivetrain);
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
         // Elevator Commands
-        NamedCommands.registerCommand("L1", Commands.runOnce(() -> elevator.setLevelOne()));
-        NamedCommands.registerCommand("L2", Commands.runOnce(() -> elevator.setLevelTwo()));
-        NamedCommands.registerCommand("L3", Commands.runOnce(() -> elevator.setLevelThree()));
-        NamedCommands.registerCommand("L4", new SimulatePlacingCoralL4(drivetrain, effector));
-        NamedCommands.registerCommand("waitForL1", new WaitUntilCommand(elevator.isL4));
-        NamedCommands.registerCommand("waitForL4", new WaitUntilCommand(elevator.isL4));
+        NamedCommands.registerCommand("L1", elevatorSim.simulateSetpoint(0));
+        NamedCommands.registerCommand("L2", elevatorSim.simulateSetpoint(40));
+        NamedCommands.registerCommand("L3", elevatorSim.simulateSetpoint(64));
+        NamedCommands.registerCommand("L4", elevatorSim.simulateSetpoint(100));
+        NamedCommands.registerCommand("waitForL1", new WaitUntilCommand(elevatorSim.isL1));
+        NamedCommands.registerCommand("waitForL4", new WaitUntilCommand(elevatorSim.isL4));
 
         // Effector Commands
-        NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
+        NamedCommands.registerCommand("dispenseCoral", new DecideWhereToPlaceCoral(elevatorSim, drivetrain, effector));
+        NamedCommands.registerCommand("dispenseL4Coral", new SimulatePlacingCoralL4(drivetrain, effector));
         NamedCommands.registerCommand("waitForCoral", new WaitUntilCommand(effector.checkBeam));
-        NamedCommands.registerCommand("loadCoral", new GetDistanceFromStation(drivetrain, effector));
+        NamedCommands.registerCommand("loadCoral", new SimulateCoralIntake(drivetrain, effector));
         NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0).andThen(effector.setConveyorVoltageCommand(0.0)));
         NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
 
@@ -101,35 +102,25 @@ public class RobotContainer {
         );
 
         // Point wheels towards center
-        Constants.OperatorConstants.driverController.b().onTrue(new GetDistanceFromStation(drivetrain, effector));
+        Constants.OperatorConstants.driverController.a().onTrue(new SimulateCoralIntake(drivetrain, effector));
+        Constants.OperatorConstants.driverController.b().onTrue(new DecideWhereToPlaceCoral(elevatorSim, drivetrain, effector));
 
         // Pathfinding control
         Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> photonSim.pathfindWithPath("Left").schedule()).unless(() -> photonSim.tid <= 0));
         Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> photonSim.pathfindWithPath("Right").schedule()).unless(() -> photonSim.tid <= 0));
-        Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> photonSim.pathfindWithPath("Center").schedule()).unless(() -> photonSim.tid <= 0));
+        Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> effector.clearArray()));
         
         // Miscellaneous
         Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
-        Constants.OperatorConstants.driverController.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
-        // Elevator Manual Control
-        Constants.OperatorConstants.operatorController.leftTrigger()
-            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(2)))
-            .onFalse(elevator.setVoltage(0));
-        Constants.OperatorConstants.operatorController.rightTrigger()
-            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-2)))
-            .onFalse(elevator.setVoltage(0));
         
         // Elevator Automatic Control    
-        Constants.OperatorConstants.driverController.povUp().onTrue(new SimulatePlacingCoralL3(drivetrain, effector));
-        Constants.OperatorConstants.driverController.povLeft().onTrue(new SimulatePlacingCoralL2(drivetrain, effector));
-        Constants.OperatorConstants.driverController.povRight().onTrue(new SimulatePlacingCoralL4(drivetrain, effector));
+        Constants.OperatorConstants.driverController.povUp().onTrue(elevatorSim.simulateSetpoint(64));
+        Constants.OperatorConstants.driverController.povLeft().onTrue(elevatorSim.simulateSetpoint(40));
+        Constants.OperatorConstants.driverController.povRight().onTrue(elevatorSim.simulateSetpoint(100));
+        Constants.OperatorConstants.driverController.povDown().onTrue(elevatorSim.simulateSetpoint(0));
 
-        // Effector Controls
-        Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
-        Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));
-        Constants.OperatorConstants.operatorController.x().whileTrue(new IntakeAlgae(effector));
-        Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> new EffectorPivot(effector).execute()));
+        Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> elevatorSim.manualControl = true));
+        Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> elevatorSim.manualControl = true));
         
         // Fancy logging stuff that fills all the storage on the RIO
         drivetrain.registerTelemetry(logger::telemeterize);

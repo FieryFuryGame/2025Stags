@@ -11,6 +11,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -315,6 +316,12 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     field2d.setRobotPose(m_robotContainer.drivetrain.getState().Pose);
+
+    if (DriverStation.getMatchTime() == -1) {
+      SmartDashboard.putNumber("Match Time", 0);
+    } else {
+      SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+    }
   }
 
   @Override

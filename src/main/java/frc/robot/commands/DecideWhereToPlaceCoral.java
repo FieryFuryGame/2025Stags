@@ -4,16 +4,9 @@
 
 package frc.robot.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.pathplanner.lib.path.PathConstraints;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ElevatorSim;
 import frc.robot.subsystems.EndEffector;
 
 // import frc.robot.subsystems.CANLauncher;
@@ -21,28 +14,21 @@ import frc.robot.subsystems.EndEffector;
 /*This is an example of creating a command as a class. The base Command class provides a set of methods that your command
  * will override.
  */
-public class GetDistanceFromStation extends Command {
+public class DecideWhereToPlaceCoral extends Command {
+  ElevatorSim elevatorSim;
   CommandSwerveDrivetrain drivetrain;
   EndEffector effector;
-
-  List<Pose2d> stationPoses = new ArrayList<Pose2d>();
-
-  PathConstraints constraints = new PathConstraints(
-        6.0, 5.0,
-        Units.degreesToRadians(540), Units.degreesToRadians(720));
-
+  int branch = 0;
   boolean isFinished = false;
 
-  public GetDistanceFromStation(CommandSwerveDrivetrain drivetrain, EndEffector effector) {
+  /** Creates a new LaunchNote. */
+  public DecideWhereToPlaceCoral(ElevatorSim elevator, CommandSwerveDrivetrain drivetrain, EndEffector effector) {
+    // save the launcher system internally
+    elevatorSim = elevator;
     this.drivetrain = drivetrain;
     this.effector = effector;
 
-    stationPoses.add(new Pose2d(1.199, 7.052, Rotation2d.fromDegrees(-54.46)));
-    stationPoses.add(new Pose2d(1.199, 0.998, Rotation2d.fromDegrees(54.46)));
-  }
-
-  public Pose2d getNearest() {
-    return drivetrain.getState().Pose.nearest(stationPoses);
+    addRequirements(drivetrain, effector);
   }
 
   // The initialize method is called when the command is initially scheduled.
@@ -54,12 +40,24 @@ public class GetDistanceFromStation extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Pose2d drivePose = drivetrain.getState().Pose;
-    Pose2d nearestPose = getNearest();
-    double distance = Math.sqrt(Math.pow((nearestPose.getX() - drivePose.getX()), 2) + Math.pow((nearestPose.getY() - nearestPose.getY()), 2));
-    System.out.println(distance);
-    if (distance < 0.5) {
-      effector.simulatedBeamBreak = true;
+    if (elevatorSim.percentageUp > 20) {
+        if (elevatorSim.percentageUp > 35 && elevatorSim.percentageUp < 45) {
+            branch = 2;
+        }
+        if (elevatorSim.percentageUp > 59 && elevatorSim.percentageUp < 69) {
+            branch = 3;
+        }
+        if (elevatorSim.percentageUp > 90) {
+            branch = 4;
+        }
+
+        if (branch == 2) {
+            new SimulatePlacingCoralL2(drivetrain, effector).schedule();
+        } else if (branch == 3) {
+            new SimulatePlacingCoralL3(drivetrain, effector).schedule();
+        } else if (branch == 4) {
+            new SimulatePlacingCoralL4(drivetrain, effector).schedule();
+        }
     }
     isFinished = true;
   }
@@ -74,7 +72,6 @@ public class GetDistanceFromStation extends Command {
   
   @Override
   public void end(boolean interrupted) {
-    // Stop the wheels when the command ends.
-    
+
   }
 }

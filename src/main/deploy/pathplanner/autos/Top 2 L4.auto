@@ -19,6 +19,12 @@
                 "data": {
                   "name": "L4"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "waitForL4"
+                }
               }
             ]
           }
@@ -27,30 +33,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.4
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "pivotEffector"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.6
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "dispenseCoral"
-                }
-              },
               {
                 "type": "wait",
                 "data": {
@@ -60,28 +42,15 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "stopEffector"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "pivotEffector"
+                  "name": "dispenseL4Coral"
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.7
+                  "waitTime": 1.7
                 }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
+              },
               {
                 "type": "named",
                 "data": {
@@ -102,6 +71,12 @@
           "data": {
             "commands": [
               {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.5
+                }
+              },
+              {
                 "type": "named",
                 "data": {
                   "name": "loadCoral"
@@ -119,12 +94,6 @@
                 "data": {
                   "waitTime": 1.0
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopEffector"
-                }
               }
             ]
           }
@@ -140,15 +109,15 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 3.0
+                  "name": "L4"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L4"
+                  "name": "waitForL4"
                 }
               }
             ]
@@ -161,58 +130,22 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.4
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "pivotEffector"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.6
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "dispenseCoral"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
                   "waitTime": 1.0
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "stopEffector"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "pivotEffector"
+                  "name": "dispenseL4Coral"
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.7
+                  "waitTime": 1.7
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": []
           }
         }
       ]

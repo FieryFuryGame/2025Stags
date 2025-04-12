@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.EndEffector;
@@ -101,11 +100,12 @@ public class SimulatePlacingCoralL2 extends Command {
   public void execute() {
     coralPose = new Pose3d(getNearestBranch());
     Rotation3d rotation = getRotationAngle();
-    double[] coralPoseArray = {coralPose.getX(), coralPose.getY(), 0.77, rotation.getQuaternion().getW(), rotation.getQuaternion().getX(), rotation.getQuaternion().getY(), rotation.getQuaternion().getZ()};
+    Pose3d coralToUse = new Pose3d(coralPose.getX(), coralPose.getY(), 0.77, rotation);
     canPlace = true;
     if (effector.simulatedBeamBreak) {
-      SmartDashboard.putNumberArray(Integer.toString(branchID), coralPoseArray);
+      effector.reefCoral.add(coralToUse);
       effector.simulatedBeamBreak = false;
+      effector.updateArray();
     }
   }
 

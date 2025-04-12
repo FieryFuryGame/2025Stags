@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -8,6 +10,10 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,11 +33,18 @@ public class EndEffector extends SubsystemBase {
     public BooleanSupplier checkBeam = () -> !beamBreak.get();
 
     public boolean simulatedBeamBreak = true;
+
+    public List<Pose3d> reefCoral = new ArrayList<>();
+    Pose3d[] reefArray = new Pose3d[]{};
+
+    StructArrayPublisher<Pose3d> publisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("CoralPositions", Pose3d.struct).publish();
     
     public EndEffector() {
         setMotorSettings();
         effectorPivot.setPosition(0.0);
         effectorPivot.setControl(positionVoltage.withPosition(effectorPivot.getPosition().getValueAsDouble()).withSlot(0));
+        SmartDashboard.putData("Clear Reef", runOnce(() -> clearArray()));
     }
 
     public void setMotorSettings() {
@@ -58,6 +71,22 @@ public class EndEffector extends SubsystemBase {
 
     public Command setWheelVoltageCommand(double power) {
         return runOnce(() -> effectorWheels.setVoltage(power));
+    }
+
+    public void updateArray() {
+        if (!reefCoral.isEmpty()) {
+            int length = reefCoral.size();
+            Pose3d[] poses = new Pose3d[length];
+            for (int i = 0; i < length; i++) {
+                poses[i] = reefCoral.get(i);
+            }
+            reefArray = poses;
+        }
+    }
+
+    public void clearArray() {
+        reefCoral.clear();
+        reefArray = new Pose3d[]{};
     }
 
     public void setWheelVoltage(double power) {
@@ -118,6 +147,7 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putNumber("conveyorRPM", conveyor.getRotorVelocity().getValueAsDouble());
         SmartDashboard.putBoolean("coralLoadedInEffector", simulatedBeamBreak);
 
+        publisher.set(reefArray);
     }
     
 }
