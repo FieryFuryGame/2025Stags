@@ -44,7 +44,7 @@ public class EndEffector extends SubsystemBase {
         setMotorSettings();
         effectorPivot.setPosition(0.0);
         effectorPivot.setControl(positionVoltage.withPosition(effectorPivot.getPosition().getValueAsDouble()).withSlot(0));
-        SmartDashboard.putData("Clear Reef", runOnce(() -> clearArray()));
+        SmartDashboard.putData("Clear Reef", runOnce(() -> clearArray()).ignoringDisable(true));
     }
 
     public void setMotorSettings() {

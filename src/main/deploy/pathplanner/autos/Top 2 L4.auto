@@ -34,21 +34,9 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.0
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "dispenseL4Coral"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.7
                 }
               },
               {
@@ -71,12 +59,6 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.5
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "loadCoral"
@@ -88,14 +70,7 @@
         {
           "type": "sequential",
           "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.0
-                }
-              }
-            ]
+            "commands": []
           }
         },
         {
@@ -128,21 +103,9 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.0
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "dispenseL4Coral"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.7
                 }
               }
             ]
