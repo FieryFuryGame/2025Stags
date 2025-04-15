@@ -77,6 +77,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("loadCoral", new SimulateCoralIntake(drivetrain, effector));
         NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0).andThen(effector.setConveyorVoltageCommand(0.0)));
         NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
+        NamedCommands.registerCommand("leaveStartScore", Commands.runOnce(() -> effector.simulatedScore = effector.simulatedScore += 3));
 
         // Swerve Commands
         NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));

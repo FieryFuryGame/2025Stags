@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.EndEffector;
@@ -106,6 +107,15 @@ public class SimulatePlacingCoralL3 extends Command {
       effector.reefCoral.add(coralToUse);
       effector.simulatedBeamBreak = false;
       effector.updateArray();
+      score();
+    }
+  }
+
+  public void score() {
+    if (DriverStation.isAutonomousEnabled()) {
+      effector.simulatedScore = effector.simulatedScore += 6;
+    } else if (DriverStation.isTeleopEnabled()) {
+      effector.simulatedScore = effector.simulatedScore += 4;
     }
   }
 
