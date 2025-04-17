@@ -47,6 +47,7 @@ public class PhotonSim extends SubsystemBase {
         new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
         new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90))
     );
+
     PathPlannerPath alignmentPath = new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0.0, Rotation2d.fromDegrees(-90)));
 
     public PhotonSim(CommandSwerveDrivetrain drivetrain) {
@@ -64,7 +65,7 @@ public class PhotonSim extends SubsystemBase {
         Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(0), 0);
         Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
 
-        cameraSim.enableDrawWireframe(true);
+        cameraSim.enableDrawWireframe(false);
 
         visionSim.addCamera(cameraSim, robotToCamera);
     }

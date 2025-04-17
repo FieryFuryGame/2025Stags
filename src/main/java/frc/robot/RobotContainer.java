@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.commands.AlignToReef;
 import frc.robot.commands.DecideWhereToPlaceCoral;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.SimulateCoralIntake;
@@ -107,8 +108,8 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.b().onTrue(new DecideWhereToPlaceCoral(elevatorSim, drivetrain, effector));
 
         // Pathfinding control
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> photonSim.pathfindWithPath("Left").schedule()).unless(() -> photonSim.tid <= 0));
-        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> photonSim.pathfindWithPath("Right").schedule()).unless(() -> photonSim.tid <= 0));
+        Constants.OperatorConstants.driverController.leftBumper().onTrue(new AlignToReef(drivetrain, "Left"));
+        Constants.OperatorConstants.driverController.rightBumper().onTrue(new AlignToReef(drivetrain, "Right"));
         Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> effector.clearArray()));
         
         // Miscellaneous

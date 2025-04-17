@@ -5,6 +5,19 @@
     "data": {
       "commands": [
         {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Top"
@@ -18,12 +31,6 @@
                 "type": "named",
                 "data": {
                   "name": "leaveStartScore"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
                 }
               },
               {
@@ -69,6 +76,12 @@
                 "data": {
                   "name": "loadCoral"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4"
+                }
               }
             ]
           }
@@ -83,12 +96,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -132,6 +139,12 @@
                 "data": {
                   "name": "loadCoral"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4"
+                }
               }
             ]
           }
@@ -146,12 +159,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -195,6 +202,12 @@
                 "data": {
                   "name": "loadCoral"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4"
+                }
               }
             ]
           }
@@ -209,12 +222,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -247,6 +254,132 @@
           "type": "path",
           "data": {
             "pathName": "Top 8"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "loadCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top 9"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "waitForL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "dispenseL4Coral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top 10"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "loadCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top 11"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "waitForL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "dispenseL4Coral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top 12"
           }
         },
         {

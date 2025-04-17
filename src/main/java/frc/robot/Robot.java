@@ -9,7 +9,11 @@ import java.util.Random;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -36,7 +40,8 @@ public class Robot extends TimedRobot {
     alert.set(true);
   }
 
-  public void motivationalQuotes() { // Joke we are doing for the drivers during testing.
+  /*** We don't ask questions here. */
+  public void motivationalQuotes() {
     Random random = new Random();
     int choice = random.nextInt(85) + 1;
     switch (choice) {
@@ -309,6 +314,22 @@ public class Robot extends TimedRobot {
     }
     FollowPathCommand.warmupCommand().schedule();
     PathfindingCommand.warmupCommand().schedule();
+    renderAlgae();
+  }
+  /*** Method until I actually feel like implementing algae pickup. This is likely to be moved/changed later. */
+  public void renderAlgae() {
+    StructArrayPublisher<Pose3d> publisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("Algae Positions", Pose3d.struct).publish();
+    Pose3d[] algaeArray = {
+      new Pose3d(5.179, 4.025, 0.9, Rotation3d.kZero),
+      new Pose3d(4.831, 3.42, 1.3, Rotation3d.kZero),
+      new Pose3d(4.136, 3.42, 0.9, Rotation3d.kZero),
+      new Pose3d(3.812, 4.025, 1.3, Rotation3d.kZero),
+      new Pose3d(4.148, 4.618, 0.9, Rotation3d.kZero),
+      new Pose3d(4.832, 4.618, 1.3, Rotation3d.kZero)
+    };
+
+    publisher.set(algaeArray);
   }
 
   @Override
