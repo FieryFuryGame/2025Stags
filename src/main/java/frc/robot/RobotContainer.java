@@ -108,9 +108,9 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.b().onTrue(new DecideWhereToPlaceCoral(elevatorSim, drivetrain, effector));
 
         // Pathfinding control
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(new AlignToReef(drivetrain, "Left"));
-        Constants.OperatorConstants.driverController.rightBumper().onTrue(new AlignToReef(drivetrain, "Right"));
-        Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> effector.clearArray()));
+        Constants.OperatorConstants.driverController.leftBumper().whileTrue(new AlignToReef(drivetrain, "Left"));
+        Constants.OperatorConstants.driverController.rightBumper().whileTrue(new AlignToReef(drivetrain, "Right"));
+         // Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> effector.clearArray()));
         
         // Miscellaneous
         Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
