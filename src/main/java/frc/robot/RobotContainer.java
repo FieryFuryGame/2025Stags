@@ -21,12 +21,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.commands.AlignToReef;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.EjectCoral;
 import frc.robot.commands.LoadCoral;
 import frc.robot.commands.IntakeAlgae;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
@@ -100,8 +100,8 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
         // Pathfinding control
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Left").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
-        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Right").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
+        Constants.OperatorConstants.driverController.leftBumper().onTrue(new AlignToReef(drivetrain, "Left"));
+        Constants.OperatorConstants.driverController.rightBumper().onTrue(new AlignToReef(drivetrain, "Right"));
         Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> limelight.pathfindWithPath("Center").schedule()).unless(() -> limelight.tid.getDouble(0.0) <= 0));
         
         // Miscellaneous
