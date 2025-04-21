@@ -27,7 +27,7 @@ public class AlignToReef extends Command {
     boolean pathIsFine = true;
 
     PathConstraints constraints = new PathConstraints(
-        5.0, 4.0,
+        3, 4.0,
         Units.degreesToRadians(540), Units.degreesToRadians(720));
 
     public AlignToReef(CommandSwerveDrivetrain drivetrain, String trigger) {
