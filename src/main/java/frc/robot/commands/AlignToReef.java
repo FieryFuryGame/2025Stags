@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
@@ -25,9 +24,7 @@ public class AlignToReef extends Command {
     String trigger;
 
     boolean finished = false;
-
-    List<Pose2d> leftPositions = new ArrayList<Pose2d>();
-    List<Pose2d> rightPositions = new ArrayList<Pose2d>();
+    boolean pathIsFine = true;
 
     PathConstraints constraints = new PathConstraints(
         5.0, 4.0,
@@ -43,24 +40,25 @@ public class AlignToReef extends Command {
 
     @Override
     public void execute() {
+        pathIsFine = true;
+        finished = false;
         Pose2d drivePose = drivetrain.getState().Pose;
         Pose2d nearestBranch = new Pose2d();
-        trigger = getTriggerPressed(trigger);
-        boolean pathIsFine = true;
 
-        addPosesToArrayBlue();
-        addPosesToArrayRed();
-
-        switch (trigger) {
-            case "Left":
-                nearestBranch = drivePose.nearest(leftPositions);
-                break;
-            case "Right":
-                nearestBranch = drivePose.nearest(rightPositions);
-                break;
-            default:
-                pathIsFine = false;
-                break;
+        List<Pose2d> leftPositions = addLeftPoses();
+        List<Pose2d> rightPositions = addRightPoses();
+        if (pathIsFine) {
+            switch (trigger) {
+                case "Left":
+                    nearestBranch = drivePose.nearest(leftPositions);
+                    break;
+                case "Right":
+                    nearestBranch = drivePose.nearest(rightPositions);
+                    break;
+                default:
+                    pathIsFine = false;
+                    break;
+            }
         }
 
         if (pathIsFine) {
@@ -72,6 +70,8 @@ public class AlignToReef extends Command {
             );
             path.preventFlipping = true;
             AutoBuilder.followPath(path).schedule();
+        } else {
+            System.out.println("[Pathfinding] Something went wrong. Cancelling...");
         }
         finished = true;
     }
@@ -86,52 +86,50 @@ public class AlignToReef extends Command {
 
     }
 
-    public void addPosesToArrayRed() {
-        leftPositions.add(new Pose2d(3.728, 3.036, Rotation2d.fromDegrees(60))); // 17
-        leftPositions.add(new Pose2d(3.225, 4.187, Rotation2d.fromDegrees(0))); // 18
-        leftPositions.add(new Pose2d(4.016, 5.194, Rotation2d.fromDegrees(-60))); // 19
-        leftPositions.add(new Pose2d(5.263, 5.026, Rotation2d.fromDegrees(-120))); // 20
-        leftPositions.add(new Pose2d(5.754, 3.875, Rotation2d.fromDegrees(180))); // 21
-        leftPositions.add(new Pose2d(4.987, 2.844, Rotation2d.fromDegrees(120))); // 22
-
-        rightPositions.add(new Pose2d(3.980, 2.868, Rotation2d.fromDegrees(60))); // 17
-        rightPositions.add(new Pose2d(3.213, 3.863, Rotation2d.fromDegrees(0))); // 18
-        rightPositions.add(new Pose2d(3.728, 5.038, Rotation2d.fromDegrees(-60))); // 19
-        rightPositions.add(new Pose2d(4.939, 5.170, Rotation2d.fromDegrees(-120))); // 20
-        rightPositions.add(new Pose2d(5.718, 4.199, Rotation2d.fromDegrees(180))); // 21
-        rightPositions.add(new Pose2d(5.263, 3.036, Rotation2d.fromDegrees(120))); // 22
-    }
-
-    public void addPosesToArrayBlue() {
-        leftPositions.add(new Pose2d(12.262, 3.036, Rotation2d.fromDegrees(60))); // 17
-        leftPositions.add(new Pose2d(11.759, 4.187, Rotation2d.fromDegrees(0))); // 18
-        leftPositions.add(new Pose2d(12.55, 5.194, Rotation2d.fromDegrees(-60))); // 19
-        leftPositions.add(new Pose2d(13.797, 5.026, Rotation2d.fromDegrees(-120))); // 20
-        leftPositions.add(new Pose2d(14.288, 3.875, Rotation2d.fromDegrees(180))); // 21
-        leftPositions.add(new Pose2d(13.521, 2.844, Rotation2d.fromDegrees(120))); // 22
-
-        rightPositions.add(new Pose2d(12.514, 2.868, Rotation2d.fromDegrees(60))); // 17
-        rightPositions.add(new Pose2d(11.747, 3.863, Rotation2d.fromDegrees(0))); // 18
-        rightPositions.add(new Pose2d(12.262, 5.038, Rotation2d.fromDegrees(-60))); // 19
-        rightPositions.add(new Pose2d(13.473, 5.170, Rotation2d.fromDegrees(-120))); // 20
-        rightPositions.add(new Pose2d(14.252, 4.199, Rotation2d.fromDegrees(180))); // 21
-        rightPositions.add(new Pose2d(13.797, 3.036, Rotation2d.fromDegrees(120))); // 22
-    }
-
-    public String getTriggerPressed(String trigger) {
-        if (DriverStation.getAlliance().get() == Alliance.Red) {
-            switch (trigger) {
-                case "Left":
-                    trigger = "Right";
-                    break;
-                case "Right":
-                    trigger = "Left";
-                    break;
-            }
-            return trigger;
+    public List<Pose2d> addLeftPoses() {
+        List<Pose2d> poses = new ArrayList<Pose2d>();
+        if (DriverStation.getAlliance().get() == Alliance.Blue) {
+            poses.add(new Pose2d(3.185, 4.182, Rotation2d.fromDegrees(0)));
+            poses.add(new Pose2d(3.690, 3.0, Rotation2d.fromDegrees(60)));
+            poses.add(new Pose2d(5.003, 2.795, Rotation2d.fromDegrees(120)));
+            poses.add(new Pose2d(5.795, 3.861, Rotation2d.fromDegrees(180)));
+            poses.add(new Pose2d(5.290, 5.077, Rotation2d.fromDegrees(-120)));
+            poses.add(new Pose2d(3.977, 5.241, Rotation2d.fromDegrees(-60)));
+        } else if (DriverStation.getAlliance().get() == Alliance.Red) {
+            poses.add(new Pose2d(11.755, 4.189, Rotation2d.fromDegrees(0)));
+            poses.add(new Pose2d(12.260, 2.959, Rotation2d.fromDegrees(60)));
+            poses.add(new Pose2d(13.573, 2.809, Rotation2d.fromDegrees(120)));
+            poses.add(new Pose2d(14.379, 3.847, Rotation2d.fromDegrees(180)));
+            poses.add(new Pose2d(13.860, 5.077, Rotation2d.fromDegrees(-120)));
+            poses.add(new Pose2d(12.561, 5.241, Rotation2d.fromDegrees(-60)));
         } else {
-            return trigger;
+            pathIsFine = false;
         }
+
+        return poses;
+    }
+
+    public List<Pose2d> addRightPoses() {
+        List<Pose2d> poses = new ArrayList<Pose2d>();
+        if (DriverStation.getAlliance().get() == Alliance.Blue) {
+            poses.add(new Pose2d(3.185, 3.847, Rotation2d.fromDegrees(0)));
+            poses.add(new Pose2d(3.977, 2.809, Rotation2d.fromDegrees(60)));
+            poses.add(new Pose2d(5.303, 2.973, Rotation2d.fromDegrees(120)));
+            poses.add(new Pose2d(5.795, 4.182, Rotation2d.fromDegrees(180)));
+            poses.add(new Pose2d(5.003, 5.255, Rotation2d.fromDegrees(-120)));
+            poses.add(new Pose2d(3.677, 5.064, Rotation2d.fromDegrees(-60)));
+        } else if (DriverStation.getAlliance().get() == Alliance.Red) {
+            poses.add(new Pose2d(11.755, 3.847, Rotation2d.fromDegrees(0)));
+            poses.add(new Pose2d(12.561, 2.809, Rotation2d.fromDegrees(60)));
+            poses.add(new Pose2d(13.860, 2.986, Rotation2d.fromDegrees(120)));
+            poses.add(new Pose2d(14.365, 4.203, Rotation2d.fromDegrees(180)));
+            poses.add(new Pose2d(13.559, 5.255, Rotation2d.fromDegrees(-120)));
+            poses.add(new Pose2d(12.247, 5.064, Rotation2d.fromDegrees(-60)));
+        } else {
+            pathIsFine = false;
+        }
+
+        return poses;
     }
 
 }
