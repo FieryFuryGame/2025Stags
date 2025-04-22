@@ -49,6 +49,19 @@ public class SimulatePlacingCoralL3 extends Command {
     branchRobotPositions.add(new Pose2d(3.7, 3.863, Rotation2d.fromDegrees(120)));
     branchRobotPositions.add(new Pose2d(3.7, 4.2, Rotation2d.fromDegrees(120)));
 
+    branchRobotPositions.add(new Pose2d(12.544, 4.63, Rotation2d.fromDegrees(60)));
+    branchRobotPositions.add(new Pose2d(12.826, 4.78, Rotation2d.fromDegrees(60)));
+    branchRobotPositions.add(new Pose2d(13.329, 4.810, Rotation2d.fromDegrees(0)));
+    branchRobotPositions.add(new Pose2d(13.617, 4.631, Rotation2d.fromDegrees(0)));
+    branchRobotPositions.add(new Pose2d(13.894, 4.2, Rotation2d.fromDegrees(-60)));
+    branchRobotPositions.add(new Pose2d(13.894, 3.875, Rotation2d.fromDegrees(-60)));
+    branchRobotPositions.add(new Pose2d(13.629, 3.396, Rotation2d.fromDegrees(-120)));
+    branchRobotPositions.add(new Pose2d(13.353, 3.264, Rotation2d.fromDegrees(-120)));
+    branchRobotPositions.add(new Pose2d(12.814, 3.228, Rotation2d.fromDegrees(180)));
+    branchRobotPositions.add(new Pose2d(12.502, 3.396, Rotation2d.fromDegrees(180)));
+    branchRobotPositions.add(new Pose2d(12.294, 3.863, Rotation2d.fromDegrees(120)));
+    branchRobotPositions.add(new Pose2d(12.294, 4.2, Rotation2d.fromDegrees(120)));
+
     this.addRequirements(effector);
   }
 

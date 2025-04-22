@@ -39,6 +39,8 @@ public class SimulateCoralIntake extends Command {
 
     stationPoses.add(new Pose2d(1.199, 7.052, Rotation2d.fromDegrees(-54.46)));
     stationPoses.add(new Pose2d(1.199, 0.998, Rotation2d.fromDegrees(54.46)));
+    stationPoses.add(new Pose2d(16.315, 7.076, Rotation2d.fromDegrees(-126.52)));
+    stationPoses.add(new Pose2d(16.315, 0.96, Rotation2d.fromDegrees(126.52)));
   }
 
   public Pose2d getNearest() {
