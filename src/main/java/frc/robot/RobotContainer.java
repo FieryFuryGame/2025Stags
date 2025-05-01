@@ -17,22 +17,28 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.LimelightHelpers.PoseEstimate;
-import frc.robot.commands.AlignToReef;
+import frc.robot.commands.AlignToAlgae;
+import frc.robot.commands.AlignToBranch;
 import frc.robot.commands.DecideWhereToPlaceCoral;
+import frc.robot.commands.DecideWhereToPlaceCoralExtra;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.SimulateCoralIntake;
+import frc.robot.commands.SimulateCoralIntakeExtra;
 import frc.robot.commands.SimulatePlacingCoralL4;
+import frc.robot.generated.ExtraDriverConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSim;
+import frc.robot.subsystems.ElevatorSimExtra;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.EndEffectorSim;
+import frc.robot.subsystems.EndEffectorSimExtra;
+import frc.robot.subsystems.ExtraDriver;
 import frc.robot.subsystems.PhotonSim;
 
 public class RobotContainer {
@@ -47,6 +53,10 @@ public class RobotContainer {
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
+    private final SwerveRequest.FieldCentric fieldDrive2 = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
     Field2d field2d = new Field2d();
@@ -58,6 +68,9 @@ public class RobotContainer {
     public final PhotonSim photonSim = new PhotonSim(drivetrain);
     public final ElevatorSim elevatorSim = new ElevatorSim();
     public final EndEffectorSim effectorSim = new EndEffectorSim(effector, elevatorSim, drivetrain);
+    public final ExtraDriver extraDriver = ExtraDriverConstants.createDrivetrain();
+    public final ElevatorSimExtra elevatorSimExtra = new ElevatorSimExtra();
+    public final EndEffectorSimExtra effectorSimExtra = new EndEffectorSimExtra(elevatorSimExtra, extraDriver);
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -78,7 +91,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("loadCoral", new SimulateCoralIntake(drivetrain, effector));
         NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0).andThen(effector.setConveyorVoltageCommand(0.0)));
         NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
-        NamedCommands.registerCommand("leaveStartScore", Commands.runOnce(() -> effector.simulatedScore = effector.simulatedScore += 3));
+        NamedCommands.registerCommand("leaveStartScore", Commands.runOnce(() -> effector.simulatedBlueScore = effector.simulatedBlueScore += 3));
 
         // Swerve Commands
         NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -103,17 +116,26 @@ public class RobotContainer {
             )
         );
 
+        extraDriver.setDefaultCommand(
+            // Drive and steer stuff
+            extraDriver.applyRequest(() ->
+                fieldDrive2.withVelocityX(-MathUtil.applyDeadband(Constants.OperatorConstants.operatorController.getLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-MathUtil.applyDeadband(Constants.OperatorConstants.operatorController.getLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-MathUtil.applyDeadband(Constants.OperatorConstants.operatorController.getRightX(), 0.1) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            )
+        );
+
         // Point wheels towards center
         Constants.OperatorConstants.driverController.a().onTrue(new SimulateCoralIntake(drivetrain, effector));
         Constants.OperatorConstants.driverController.b().onTrue(new DecideWhereToPlaceCoral(elevatorSim, drivetrain, effector));
+        Constants.OperatorConstants.operatorController.a().onTrue(new SimulateCoralIntakeExtra(extraDriver, effectorSimExtra));
+        Constants.OperatorConstants.operatorController.b().onTrue(new DecideWhereToPlaceCoralExtra(elevatorSimExtra, extraDriver, effector, effectorSimExtra));
 
         // Pathfinding control
-        Constants.OperatorConstants.driverController.leftBumper().whileTrue(new AlignToReef(drivetrain, "Left"));
-        Constants.OperatorConstants.driverController.rightBumper().whileTrue(new AlignToReef(drivetrain, "Right"));
-         // Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> effector.clearArray()));
+        Constants.OperatorConstants.driverController.leftBumper().onTrue(new AlignToBranch(drivetrain, "Left"));
+        Constants.OperatorConstants.driverController.rightBumper().onTrue(new AlignToBranch(drivetrain, "Right"));
+        Constants.OperatorConstants.driverController.y().onTrue(new AlignToAlgae(drivetrain));
         
-        // Miscellaneous
-        Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
         
         // Elevator Automatic Control    
         Constants.OperatorConstants.driverController.povUp().onTrue(elevatorSim.simulateSetpoint(64));
@@ -121,8 +143,18 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.povRight().onTrue(elevatorSim.simulateSetpoint(100));
         Constants.OperatorConstants.driverController.povDown().onTrue(elevatorSim.simulateSetpoint(0));
 
+        Constants.OperatorConstants.operatorController.povUp().onTrue(elevatorSimExtra.simulateSetpoint(64));
+        Constants.OperatorConstants.operatorController.povLeft().onTrue(elevatorSimExtra.simulateSetpoint(40));
+        Constants.OperatorConstants.operatorController.povRight().onTrue(elevatorSimExtra.simulateSetpoint(100));
+        Constants.OperatorConstants.operatorController.povDown().onTrue(elevatorSimExtra.simulateSetpoint(0));
+
         Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> elevatorSim.manualControl = true));
         Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> elevatorSim.manualControl = true));
+        Constants.OperatorConstants.operatorController.leftTrigger().onTrue(Commands.runOnce(() -> elevatorSimExtra.manualControl = true));
+        Constants.OperatorConstants.operatorController.rightTrigger().onTrue(Commands.runOnce(() -> elevatorSimExtra.manualControl = true));
+
+        // Constants.OperatorConstants.driverController.leftTrigger().onTrue(rotateTest.setPos(0));
+        // Constants.OperatorConstants.driverController.rightTrigger().onTrue(rotateTest.setPos(45));
         
         // Fancy logging stuff that fills all the storage on the RIO
         drivetrain.registerTelemetry(logger::telemeterize);

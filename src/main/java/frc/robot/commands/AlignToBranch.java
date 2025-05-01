@@ -16,7 +16,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-public class AlignToReef extends Command {
+public class AlignToBranch extends Command {
     
     CommandSwerveDrivetrain drivetrain;
     String trigger;
@@ -28,7 +28,7 @@ public class AlignToReef extends Command {
         3, 4.0,
         Units.degreesToRadians(540), Units.degreesToRadians(720));
 
-    public AlignToReef(CommandSwerveDrivetrain drivetrain, String trigger) {
+    public AlignToBranch(CommandSwerveDrivetrain drivetrain, String trigger) {
         this.drivetrain = drivetrain;
         this.trigger = trigger;
     }
@@ -38,38 +38,40 @@ public class AlignToReef extends Command {
 
     @Override
     public void execute() {
-        pathIsFine = true;
-        finished = false;
-        Pose2d drivePose = drivetrain.getState().Pose;
-        Pose2d nearestBranch = new Pose2d();
+        if (drivetrain.pathfindingAllowed) {
+            pathIsFine = true;
+            finished = false;
+            Pose2d drivePose = drivetrain.getState().Pose;
+            Pose2d nearestBranch = new Pose2d();
 
-        List<Pose2d> leftPositions = addLeftPoses();
-        List<Pose2d> rightPositions = addRightPoses();
-        if (pathIsFine) {
-            switch (trigger) {
-                case "Left":
-                    nearestBranch = drivePose.nearest(leftPositions);
-                    break;
-                case "Right":
-                    nearestBranch = drivePose.nearest(rightPositions);
-                    break;
-                default:
-                    pathIsFine = false;
-                    break;
+            List<Pose2d> leftPositions = addLeftPoses();
+            List<Pose2d> rightPositions = addRightPoses();
+            if (pathIsFine) {
+                switch (trigger) {
+                    case "Left":
+                        nearestBranch = drivePose.nearest(leftPositions);
+                        break;
+                    case "Right":
+                        nearestBranch = drivePose.nearest(rightPositions);
+                        break;
+                    default:
+                        pathIsFine = false;
+                        break;
+                }
             }
-        }
 
-        if (pathIsFine) {
-            double currentVelocity = drivetrain.getState().Speeds.vxMetersPerSecond + drivetrain.getState().Speeds.vyMetersPerSecond;
-            List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(drivePose, nearestBranch);
-            PathPlannerPath path = new PathPlannerPath(waypoints, constraints, 
-                new IdealStartingState(currentVelocity, Rotation2d.fromRadians(drivetrain.getState().Speeds.omegaRadiansPerSecond)), 
-                new GoalEndState(0.0, nearestBranch.getRotation())
-            );
-            path.preventFlipping = true;
-            AutoBuilder.followPath(path).schedule();
-        } else {
-            System.out.println("[Pathfinding] Something went wrong. Cancelling...");
+            if (pathIsFine) {
+                double currentVelocity = drivetrain.getState().Speeds.vxMetersPerSecond + drivetrain.getState().Speeds.vyMetersPerSecond;
+                List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(drivePose, nearestBranch);
+                PathPlannerPath path = new PathPlannerPath(waypoints, constraints, 
+                    new IdealStartingState(currentVelocity, Rotation2d.fromRadians(drivetrain.getState().Speeds.omegaRadiansPerSecond)), 
+                    new GoalEndState(0.0, nearestBranch.getRotation())
+                );
+                path.preventFlipping = true;
+                AutoBuilder.followPath(path).schedule();
+            } else {
+                System.out.println("[Pathfinding] Something went wrong. Cancelling...");
+            }
         }
         finished = true;
     }

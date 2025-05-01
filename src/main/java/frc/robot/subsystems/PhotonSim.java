@@ -86,6 +86,10 @@ public class PhotonSim extends SubsystemBase {
         }
     }
 
+    public Command pathfindTest() {
+        return AutoBuilder.pathfindToPoseFlipped(new Pose2d(2, 7, Rotation2d.kZero), constraints);
+    }
+
     public PathPlannerPath getPathToTag(String trigger) { // Uses the tag id and the name to find the path file we've created.
         try{
             int id = tid;

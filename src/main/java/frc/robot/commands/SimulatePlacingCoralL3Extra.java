@@ -14,17 +14,19 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.EndEffector;
+import frc.robot.subsystems.EndEffectorSimExtra;
+import frc.robot.subsystems.ExtraDriver;
 
 // import frc.robot.subsystems.CANLauncher;
 
 /*This is an example of creating a command as a class. The base Command class provides a set of methods that your command
  * will override.
  */
-public class SimulatePlacingCoralL3 extends Command {
-  CommandSwerveDrivetrain drivetrain;
+public class SimulatePlacingCoralL3Extra extends Command {
+  ExtraDriver drivetrain;
   EndEffector effector;
+  EndEffectorSimExtra effectorSim;
 
   Pose3d coralPose = new Pose3d();
   List<Pose2d> branchRobotPositions = new ArrayList<Pose2d>();
@@ -32,10 +34,11 @@ public class SimulatePlacingCoralL3 extends Command {
   boolean canPlace = false;
   int branchID = 3;
 
-  public SimulatePlacingCoralL3(CommandSwerveDrivetrain drivetrain, EndEffector effector) {
+  public SimulatePlacingCoralL3Extra(ExtraDriver drivetrain, EndEffector effector, EndEffectorSimExtra effectorSim) {
     this.drivetrain = drivetrain;
     this.effector = effector;
-    
+    this.effectorSim = effectorSim;
+
     branchRobotPositions.add(new Pose2d(3.95, 4.63, Rotation2d.fromDegrees(60)));
     branchRobotPositions.add(new Pose2d(4.232, 4.78, Rotation2d.fromDegrees(60)));
     branchRobotPositions.add(new Pose2d(4.735, 4.810, Rotation2d.fromDegrees(0)));
@@ -61,8 +64,6 @@ public class SimulatePlacingCoralL3 extends Command {
     branchRobotPositions.add(new Pose2d(12.502, 3.396, Rotation2d.fromDegrees(180)));
     branchRobotPositions.add(new Pose2d(12.294, 3.863, Rotation2d.fromDegrees(120)));
     branchRobotPositions.add(new Pose2d(12.294, 4.2, Rotation2d.fromDegrees(120)));
-
-    this.addRequirements(effector);
   }
 
   public Pose2d getNearestBranch() {
@@ -116,9 +117,9 @@ public class SimulatePlacingCoralL3 extends Command {
     Rotation3d rotation = getRotationAngle();
     Pose3d coralToUse = new Pose3d(coralPose.getX(), coralPose.getY(), 1.2, rotation);
     canPlace = true;
-    if (effector.simulatedBeamBreak) {
+    if (effectorSim.simulatedBeamBreak) {
       effector.reefCoral.add(coralToUse);
-      effector.simulatedBeamBreak = false;
+      effectorSim.simulatedBeamBreak = false;
       effector.updateArray();
       score();
     }
@@ -126,9 +127,9 @@ public class SimulatePlacingCoralL3 extends Command {
 
   public void score() {
     if (DriverStation.isAutonomousEnabled()) {
-      effector.simulatedBlueScore = effector.simulatedBlueScore += 6;
+      effector.simulatedRedScore = effector.simulatedRedScore += 6;
     } else if (DriverStation.isTeleopEnabled()) {
-      effector.simulatedBlueScore = effector.simulatedBlueScore += 4;
+      effector.simulatedRedScore = effector.simulatedRedScore += 4;
     }
   }
 

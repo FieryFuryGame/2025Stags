@@ -92,9 +92,9 @@ public class SimulatePlacingCoralL4 extends Command {
 
   public void score() {
     if (DriverStation.isAutonomousEnabled()) {
-      effector.simulatedScore = effector.simulatedScore += 7;
+      effector.simulatedBlueScore = effector.simulatedBlueScore += 7;
     } else if (DriverStation.isTeleopEnabled()) {
-      effector.simulatedScore = effector.simulatedScore += 5;
+      effector.simulatedBlueScore = effector.simulatedBlueScore += 5;
     }
   }
 

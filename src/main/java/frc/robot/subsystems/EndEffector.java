@@ -33,7 +33,8 @@ public class EndEffector extends SubsystemBase {
     public BooleanSupplier checkBeam = () -> !beamBreak.get();
 
     public boolean simulatedBeamBreak = true;
-    public int simulatedScore = 0;
+    public int simulatedBlueScore = 0;
+    public int simulatedRedScore = 0;
 
     public List<Pose3d> reefCoral = new ArrayList<>();
     Pose3d[] reefArray = new Pose3d[]{};
@@ -48,10 +49,13 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putData("Reset Simulation", runOnce(() -> 
             {
                 clearArray();
-                simulatedScore = 0;
+                simulatedBlueScore = 0;
+                simulatedRedScore = 0;
                 simulatedBeamBreak = true;
             }).ignoringDisable(true)
         );
+        
+        
     }
 
     public void setMotorSettings() {
@@ -153,7 +157,8 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putNumber("endEffectorPivotPos", effectorPivot.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("conveyorRPM", conveyor.getRotorVelocity().getValueAsDouble());
         SmartDashboard.putBoolean("coralLoadedInEffector", simulatedBeamBreak);
-        SmartDashboard.putNumber("Score", simulatedScore);
+        SmartDashboard.putNumber("Blue Alliance Score", simulatedBlueScore);
+        SmartDashboard.putNumber("Red Alliance Score", simulatedRedScore);
 
         publisher.set(reefArray);
     }
