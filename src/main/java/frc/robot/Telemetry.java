@@ -1,13 +1,9 @@
 package frc.robot;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -27,9 +23,6 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 public class Telemetry {
     private final double MaxSpeed;
 
-    private final List<Pose2d> leftPositions = new ArrayList<Pose2d>();
-    private final List<Pose2d> rightPositions = new ArrayList<Pose2d>();
-
     /**
      * Construct a telemetry object, with the specified max speed of the robot
      * 
@@ -37,36 +30,7 @@ public class Telemetry {
      */
     public Telemetry(double maxSpeed) {
         MaxSpeed = maxSpeed;
-        addPoses();
         SignalLogger.start();
-    }
-
-    public void addPoses() {
-        leftPositions.add(new Pose2d(3.185, 4.182, Rotation2d.fromDegrees(0)));
-        leftPositions.add(new Pose2d(3.690, 3.0, Rotation2d.fromDegrees(60)));
-        leftPositions.add(new Pose2d(5.003, 2.795, Rotation2d.fromDegrees(120)));
-        leftPositions.add(new Pose2d(5.795, 3.861, Rotation2d.fromDegrees(180)));
-        leftPositions.add(new Pose2d(5.290, 5.077, Rotation2d.fromDegrees(-120)));
-        leftPositions.add(new Pose2d(3.977, 5.241, Rotation2d.fromDegrees(-60)));
-        leftPositions.add(new Pose2d(11.755, 4.189, Rotation2d.fromDegrees(0)));
-        leftPositions.add(new Pose2d(12.260, 2.959, Rotation2d.fromDegrees(60)));
-        leftPositions.add(new Pose2d(13.573, 2.809, Rotation2d.fromDegrees(120)));
-        leftPositions.add(new Pose2d(14.379, 3.847, Rotation2d.fromDegrees(180)));
-        leftPositions.add(new Pose2d(13.860, 5.077, Rotation2d.fromDegrees(-120)));
-        leftPositions.add(new Pose2d(12.561, 5.241, Rotation2d.fromDegrees(-60)));
-
-        rightPositions.add(new Pose2d(3.185, 3.847, Rotation2d.fromDegrees(0)));
-        rightPositions.add(new Pose2d(3.977, 2.809, Rotation2d.fromDegrees(60)));
-        rightPositions.add(new Pose2d(5.303, 2.973, Rotation2d.fromDegrees(120)));
-        rightPositions.add(new Pose2d(5.795, 4.182, Rotation2d.fromDegrees(180)));
-        rightPositions.add(new Pose2d(5.003, 5.255, Rotation2d.fromDegrees(-120)));
-        rightPositions.add(new Pose2d(3.677, 5.064, Rotation2d.fromDegrees(-60)));
-        rightPositions.add(new Pose2d(11.755, 3.847, Rotation2d.fromDegrees(0)));
-        rightPositions.add(new Pose2d(12.561, 2.809, Rotation2d.fromDegrees(60)));
-        rightPositions.add(new Pose2d(13.860, 2.986, Rotation2d.fromDegrees(120)));
-        rightPositions.add(new Pose2d(14.365, 4.203, Rotation2d.fromDegrees(180)));
-        rightPositions.add(new Pose2d(13.559, 5.255, Rotation2d.fromDegrees(-120)));
-        rightPositions.add(new Pose2d(12.247, 5.064, Rotation2d.fromDegrees(-60)));
     }
 
     /* What to publish over networktables for telemetry */
@@ -75,8 +39,6 @@ public class Telemetry {
     /* Robot swerve drive state */
     private final NetworkTable driveStateTable = inst.getTable("DriveState");
     private final StructPublisher<Pose2d> drivePose = driveStateTable.getStructTopic("Pose", Pose2d.struct).publish();
-    private final StructPublisher<Pose2d> nearestLeftTag = driveStateTable.getStructTopic("ClosestLeft", Pose2d.struct).publish();
-    private final StructPublisher<Pose2d> nearestRightTag = driveStateTable.getStructTopic("ClosestRight", Pose2d.struct).publish();
     private final StructPublisher<ChassisSpeeds> driveSpeeds = driveStateTable.getStructTopic("Speeds", ChassisSpeeds.struct).publish();
     private final StructArrayPublisher<SwerveModuleState> driveModuleStates = driveStateTable.getStructArrayTopic("ModuleStates", SwerveModuleState.struct).publish();
     private final StructArrayPublisher<SwerveModuleState> driveModuleTargets = driveStateTable.getStructArrayTopic("ModuleTargets", SwerveModuleState.struct).publish();
@@ -124,8 +86,6 @@ public class Telemetry {
         /* Telemeterize the swerve drive state */
         drivePose.set(state.Pose);
         driveSpeeds.set(state.Speeds);
-        nearestLeftTag.set(state.Pose.nearest(leftPositions));
-        nearestRightTag.set(state.Pose.nearest(rightPositions));
         driveModuleStates.set(state.ModuleStates);
         driveModuleTargets.set(state.ModuleTargets);
         driveModulePositions.set(state.ModulePositions);
