@@ -27,8 +27,6 @@ public class DecideWhereToPlaceCoral extends Command {
     elevatorSim = elevator;
     this.drivetrain = drivetrain;
     this.effector = effector;
-
-    addRequirements(drivetrain, effector);
   }
 
   // The initialize method is called when the command is initially scheduled.
@@ -40,7 +38,7 @@ public class DecideWhereToPlaceCoral extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (elevatorSim.percentageUp > 20) {
+    if (elevatorSim.percentageUp > 20 && (Math.hypot(4.5 - drivetrain.getState().Pose.getX(), 4.025 - drivetrain.getState().Pose.getY()) <= 2 || Math.hypot(13.065 - drivetrain.getState().Pose.getX(), 4.025 - drivetrain.getState().Pose.getY()) <= 2)) {
         if (elevatorSim.percentageUp > 35 && elevatorSim.percentageUp < 45) {
             branch = 2;
         }

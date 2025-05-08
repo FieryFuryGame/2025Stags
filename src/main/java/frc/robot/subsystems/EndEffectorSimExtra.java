@@ -17,6 +17,10 @@ public class EndEffectorSimExtra extends SubsystemBase {
 
     StructPublisher<Pose3d> heldCoral = NetworkTableInstance.getDefault()
         .getStructTopic("HeldCoralExtra", Pose3d.struct).publish();
+    StructPublisher<Pose3d> heldAlgae = NetworkTableInstance.getDefault()
+        .getStructTopic("HeldAlgaeExtra", Pose3d.struct).publish();
+
+    boolean hasAlgae = false;
     
     public EndEffectorSimExtra(ElevatorSimExtra elevatorSimExtra, ExtraDriver drivetrain) {
         this.elevatorSimExtra = elevatorSimExtra;
@@ -34,7 +38,14 @@ public class EndEffectorSimExtra extends SubsystemBase {
         } else {
             coralPose = new Pose3d(0, 0, -3, new Rotation3d(0, 0, 0));
         }
+        Pose3d algaePose = new Pose3d(drivetrain.getState().Pose);
+        if (hasAlgae) {
+            algaePose = algaePose.transformBy(new Transform3d(0.29, 0.0, 0.05 + coralHeight.get(elevatorSimExtra.percentageUp), Rotation3d.kZero));
+        } else {
+            algaePose = new Pose3d(0, 0, -5, Rotation3d.kZero);
+        }
         heldCoral.set(coralPose);
+        heldAlgae.set(algaePose);
     }
 
 }

@@ -49,7 +49,7 @@ public class RobotContainer {
     PoseEstimate llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
     /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric fieldDrive = new SwerveRequest.FieldCentric()
+    private final SwerveRequest.RobotCentric fieldDrive = new SwerveRequest.RobotCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
@@ -152,9 +152,6 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> elevatorSim.manualControl = true));
         Constants.OperatorConstants.operatorController.leftTrigger().onTrue(Commands.runOnce(() -> elevatorSimExtra.manualControl = true));
         Constants.OperatorConstants.operatorController.rightTrigger().onTrue(Commands.runOnce(() -> elevatorSimExtra.manualControl = true));
-
-        // Constants.OperatorConstants.driverController.leftTrigger().onTrue(rotateTest.setPos(0));
-        // Constants.OperatorConstants.driverController.rightTrigger().onTrue(rotateTest.setPos(45));
         
         // Fancy logging stuff that fills all the storage on the RIO
         drivetrain.registerTelemetry(logger::telemeterize);

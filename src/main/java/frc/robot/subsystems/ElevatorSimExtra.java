@@ -103,6 +103,6 @@ public class ElevatorSimExtra extends SubsystemBase {
     public void periodic() {
         updatePoses();
         publisher.set(new Pose3d[]{affector, firstStage, secondStage});
-        SmartDashboard.putNumber("ElevatorPercentage", percentageUp);
+        SmartDashboard.putNumber("ElevatorPercentageExtra", percentageUp);
     }
 }

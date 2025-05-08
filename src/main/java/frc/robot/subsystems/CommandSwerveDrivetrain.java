@@ -155,7 +155,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         getState().Pose);
         configureAutoBuilder();
 
-        SmartDashboard.putData("Toggle Pathfinding", runOnce(() -> togglePathfind()));
+        SmartDashboard.putData("Toggle Pathfinding", runOnce(() -> togglePathfind()).ignoringDisable(true));
     }
 
     /**

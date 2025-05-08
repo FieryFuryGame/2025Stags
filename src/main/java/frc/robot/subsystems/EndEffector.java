@@ -12,6 +12,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -33,14 +34,25 @@ public class EndEffector extends SubsystemBase {
     public BooleanSupplier checkBeam = () -> !beamBreak.get();
 
     public boolean simulatedBeamBreak = true;
+    
     public int simulatedBlueScore = 0;
+    public int blueProcessorAlgae = 0, blueL4Coral = 0, blueL3Coral = 0, blueL2Coral = 0;
     public int simulatedRedScore = 0;
+    public int redProcessorAlgae = 0, redL4Coral = 0, redL3Coral = 0, redL2Coral = 0;
+    public boolean redCoralRP = false, redCoopertitionRP = false;
+    public boolean blueCoralRP = false, blueCoopertitionRP = false;
 
     public List<Pose3d> reefCoral = new ArrayList<>();
     Pose3d[] reefArray = new Pose3d[]{};
 
+    public List<Pose3d> algaePositions = new ArrayList<>();
+    Pose3d[] algaeArray = new Pose3d[]{};
+
     StructArrayPublisher<Pose3d> publisher = NetworkTableInstance.getDefault()
     .getStructArrayTopic("CoralPositions", Pose3d.struct).publish();
+    
+    StructArrayPublisher<Pose3d> algaePublisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("AlgaePositions", Pose3d.struct).publish();
     
     public EndEffector() {
         setMotorSettings();
@@ -49,13 +61,26 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putData("Reset Simulation", runOnce(() -> 
             {
                 clearArray();
+                resetAlgaeArray();
                 simulatedBlueScore = 0;
                 simulatedRedScore = 0;
+                blueProcessorAlgae = 0;
+                blueL2Coral = 0;
+                blueL3Coral = 0;
+                blueL4Coral = 0;
+                redProcessorAlgae = 0;
+                redL2Coral = 0;
+                redL3Coral = 0;
+                redL4Coral = 0;
                 simulatedBeamBreak = true;
+                redCoralRP = false;
+                redCoopertitionRP = false;
+                blueCoralRP = false;
+                blueCoopertitionRP = false;
             }).ignoringDisable(true)
         );
-        
-        
+        setupAlgaePositions();
+        updateAlgaeArray();
     }
 
     public void setMotorSettings() {
@@ -84,6 +109,15 @@ public class EndEffector extends SubsystemBase {
         return runOnce(() -> effectorWheels.setVoltage(power));
     }
 
+    public void setupAlgaePositions() {
+        algaePositions.add(new Pose3d(5.179, 4.025, 0.9, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(4.831, 3.42, 1.3, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(4.136, 3.42, 0.9, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(3.812, 4.025, 1.3, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(4.148, 4.618, 0.9, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(4.832, 4.618, 1.3, Rotation3d.kZero));
+    }
+
     public void updateArray() {
         if (!reefCoral.isEmpty()) {
             int length = reefCoral.size();
@@ -95,9 +129,26 @@ public class EndEffector extends SubsystemBase {
         }
     }
 
+    public void updateAlgaeArray() {
+        if (!algaePositions.isEmpty()) {
+            int length = algaePositions.size();
+            Pose3d[] poses = new Pose3d[length];
+            for (int i = 0; i < length; i++) {
+                poses[i] = algaePositions.get(i);
+            }
+            algaeArray = poses;
+        }
+    }
+
     public void clearArray() {
         reefCoral.clear();
         reefArray = new Pose3d[]{};
+    }
+
+    public void resetAlgaeArray() {
+        algaePositions.clear();
+        setupAlgaePositions();
+        updateAlgaeArray();
     }
 
     public void setWheelVoltage(double power) {
@@ -161,6 +212,7 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putNumber("Red Alliance Score", simulatedRedScore);
 
         publisher.set(reefArray);
+        algaePublisher.set(algaeArray);
     }
     
 }

@@ -90,7 +90,7 @@ public class AlignToBranch extends Command {
         List<Pose2d> poses = new ArrayList<Pose2d>();
 
         poses.add(new Pose2d(3.185, 4.182, Rotation2d.fromDegrees(0)));
-        poses.add(new Pose2d(3.690, 3.0, Rotation2d.fromDegrees(60)));
+        poses.add(new Pose2d(3.695, 2.982, Rotation2d.fromDegrees(60)));
         poses.add(new Pose2d(5.003, 2.795, Rotation2d.fromDegrees(120)));
         poses.add(new Pose2d(5.795, 3.861, Rotation2d.fromDegrees(180)));
         poses.add(new Pose2d(5.290, 5.077, Rotation2d.fromDegrees(-120)));
@@ -119,7 +119,7 @@ public class AlignToBranch extends Command {
         poses.add(new Pose2d(12.561, 2.809, Rotation2d.fromDegrees(60)));
         poses.add(new Pose2d(13.860, 2.986, Rotation2d.fromDegrees(120)));
         poses.add(new Pose2d(14.365, 4.203, Rotation2d.fromDegrees(180)));
-        poses.add(new Pose2d(13.559, 5.255, Rotation2d.fromDegrees(-120)));
+        poses.add(new Pose2d(13.572, 5.244, Rotation2d.fromDegrees(-120)));
         poses.add(new Pose2d(12.247, 5.064, Rotation2d.fromDegrees(-60)));
 
         return poses;
