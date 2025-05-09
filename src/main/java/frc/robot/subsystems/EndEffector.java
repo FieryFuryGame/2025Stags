@@ -39,8 +39,9 @@ public class EndEffector extends SubsystemBase {
     public int blueProcessorAlgae = 0, blueL4Coral = 0, blueL3Coral = 0, blueL2Coral = 0;
     public int simulatedRedScore = 0;
     public int redProcessorAlgae = 0, redL4Coral = 0, redL3Coral = 0, redL2Coral = 0;
-    public boolean redCoralRP = false, redCoopertitionRP = false;
-    public boolean blueCoralRP = false, blueCoopertitionRP = false;
+    public boolean redCoralRP = false, redCoopRequirement = false;
+    public boolean blueCoralRP = false, blueCoopRequirement = false;
+    boolean coopertitionAchieved = false;
 
     public List<Pose3d> reefCoral = new ArrayList<>();
     Pose3d[] reefArray = new Pose3d[]{};
@@ -58,29 +59,29 @@ public class EndEffector extends SubsystemBase {
         setMotorSettings();
         effectorPivot.setPosition(0.0);
         effectorPivot.setControl(positionVoltage.withPosition(effectorPivot.getPosition().getValueAsDouble()).withSlot(0));
-        SmartDashboard.putData("Reset Simulation", runOnce(() -> 
-            {
-                clearArray();
-                resetAlgaeArray();
-                simulatedBlueScore = 0;
-                simulatedRedScore = 0;
-                blueProcessorAlgae = 0;
-                blueL2Coral = 0;
-                blueL3Coral = 0;
-                blueL4Coral = 0;
-                redProcessorAlgae = 0;
-                redL2Coral = 0;
-                redL3Coral = 0;
-                redL4Coral = 0;
-                simulatedBeamBreak = true;
-                redCoralRP = false;
-                redCoopertitionRP = false;
-                blueCoralRP = false;
-                blueCoopertitionRP = false;
-            }).ignoringDisable(true)
-        );
         setupAlgaePositions();
         updateAlgaeArray();
+    }
+
+    public void reset() {
+        clearArray();
+        resetAlgaeArray();
+        simulatedBlueScore = 0;
+        simulatedRedScore = 0;
+        blueProcessorAlgae = 0;
+        blueL2Coral = 0;
+        blueL3Coral = 0;
+        blueL4Coral = 0;
+        redProcessorAlgae = 0;
+        redL2Coral = 0;
+        redL3Coral = 0;
+        redL4Coral = 0;
+        simulatedBeamBreak = true;
+        redCoralRP = false;
+        redCoopRequirement = false;
+        blueCoralRP = false;
+        blueCoopRequirement = false;
+        coopertitionAchieved = false;
     }
 
     public void setMotorSettings() {
@@ -116,6 +117,13 @@ public class EndEffector extends SubsystemBase {
         algaePositions.add(new Pose3d(3.812, 4.025, 1.3, Rotation3d.kZero));
         algaePositions.add(new Pose3d(4.148, 4.618, 0.9, Rotation3d.kZero));
         algaePositions.add(new Pose3d(4.832, 4.618, 1.3, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(12.383, 4.025, 0.9, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(12.707, 3.42, 1.3, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(13.426, 3.42, 0.9, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(13.774, 4.025, 1.3, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(13.39, 4.618, 0.9, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(12.731, 4.618, 1.3, Rotation3d.kZero));
+        algaePositions.add(new Pose3d(0, 0, -5, Rotation3d.kZero));
     }
 
     public void updateArray() {
@@ -205,11 +213,32 @@ public class EndEffector extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (blueProcessorAlgae >= 2 && redProcessorAlgae >= 2) {
+            coopertitionAchieved = true;
+        }
+        
+        if (blueL2Coral >= 5 && blueL3Coral >= 5 && blueL4Coral >= 5) {
+            blueCoralRP = true;
+        }
+
+        if (redL2Coral >= 5 && redL3Coral >= 5 && redL4Coral >= 5) {
+            redCoralRP = true;
+        }
+
         SmartDashboard.putNumber("endEffectorPivotPos", effectorPivot.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("conveyorRPM", conveyor.getRotorVelocity().getValueAsDouble());
         SmartDashboard.putBoolean("coralLoadedInEffector", simulatedBeamBreak);
         SmartDashboard.putNumber("Blue Alliance Score", simulatedBlueScore);
         SmartDashboard.putNumber("Red Alliance Score", simulatedRedScore);
+        SmartDashboard.putNumber("Blue L2", blueL2Coral);
+        SmartDashboard.putNumber("Blue L3", blueL3Coral);
+        SmartDashboard.putNumber("Blue L4", blueL4Coral);
+        SmartDashboard.putNumber("Red L2", redL2Coral);
+        SmartDashboard.putNumber("Red L3", redL3Coral);
+        SmartDashboard.putNumber("Red L4", redL4Coral);
+        SmartDashboard.putBoolean("Blue Coral RP", blueCoralRP);
+        SmartDashboard.putBoolean("Red Coral RP", redCoralRP);
+        SmartDashboard.putBoolean("Coopertition Achieved", coopertitionAchieved);
 
         publisher.set(reefArray);
         algaePublisher.set(algaeArray);

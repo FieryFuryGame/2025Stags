@@ -20,7 +20,7 @@ public class EndEffectorSimExtra extends SubsystemBase {
     StructPublisher<Pose3d> heldAlgae = NetworkTableInstance.getDefault()
         .getStructTopic("HeldAlgaeExtra", Pose3d.struct).publish();
 
-    boolean hasAlgae = false;
+    public boolean hasAlgae = false;
     
     public EndEffectorSimExtra(ElevatorSimExtra elevatorSimExtra, ExtraDriver drivetrain) {
         this.elevatorSimExtra = elevatorSimExtra;

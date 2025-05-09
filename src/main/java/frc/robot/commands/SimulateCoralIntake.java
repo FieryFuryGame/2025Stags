@@ -15,6 +15,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.EndEffector;
+import frc.robot.subsystems.EndEffectorSim;
 
 // import frc.robot.subsystems.CANLauncher;
 
@@ -24,6 +25,7 @@ import frc.robot.subsystems.EndEffector;
 public class SimulateCoralIntake extends Command {
   CommandSwerveDrivetrain drivetrain;
   EndEffector effector;
+  EndEffectorSim effectorSim;
 
   List<Pose2d> stationPoses = new ArrayList<Pose2d>();
 
@@ -33,9 +35,10 @@ public class SimulateCoralIntake extends Command {
 
   boolean isFinished = false;
 
-  public SimulateCoralIntake(CommandSwerveDrivetrain drivetrain, EndEffector effector) {
+  public SimulateCoralIntake(CommandSwerveDrivetrain drivetrain, EndEffector effector, EndEffectorSim effectorSim) {
     this.drivetrain = drivetrain;
     this.effector = effector;
+    this.effectorSim = effectorSim;
 
     stationPoses.add(new Pose2d(1.199, 7.052, Rotation2d.fromDegrees(-54.46)));
     stationPoses.add(new Pose2d(1.199, 0.998, Rotation2d.fromDegrees(54.46)));
@@ -59,8 +62,7 @@ public class SimulateCoralIntake extends Command {
     Pose2d drivePose = drivetrain.getState().Pose;
     Pose2d nearestPose = getNearest();
     double distance = Math.sqrt(Math.pow((nearestPose.getX() - drivePose.getX()), 2) + Math.pow((nearestPose.getY() - nearestPose.getY()), 2));
-    System.out.println(distance);
-    if (distance < 0.5) {
+    if (distance < 0.5 && !effectorSim.hasAlgae) {
       effector.simulatedBeamBreak = true;
     }
     isFinished = true;

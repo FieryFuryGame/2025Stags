@@ -3,21 +3,21 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ElevatorSim;
+import frc.robot.subsystems.ElevatorSimExtra;
 import frc.robot.subsystems.EndEffector;
-import frc.robot.subsystems.EndEffectorSim;
+import frc.robot.subsystems.EndEffectorSimExtra;
+import frc.robot.subsystems.ExtraDriver;
 
-public class SimulateAlgaeIntake extends Command {
+public class SimulateAlgaeIntakeExtra extends Command {
 
     EndEffector effector;
-    EndEffectorSim effectorSim;
-    CommandSwerveDrivetrain drivetrain;
-    ElevatorSim elevatorSim;
+    EndEffectorSimExtra effectorSim;
+    ExtraDriver drivetrain;
+    ElevatorSimExtra elevatorSim;
 
     boolean finished = false;
     
-    public SimulateAlgaeIntake(EndEffector effector, EndEffectorSim effectorSim, ElevatorSim elevatorSim, CommandSwerveDrivetrain drivetrain) {
+    public SimulateAlgaeIntakeExtra(EndEffector effector, EndEffectorSimExtra effectorSim, ElevatorSimExtra elevatorSim, ExtraDriver drivetrain) {
         this.effector = effector;
         this.effectorSim = effectorSim;
         this.drivetrain = drivetrain;
@@ -31,7 +31,7 @@ public class SimulateAlgaeIntake extends Command {
 
     @Override
     public void execute() {
-        if(!effector.simulatedBeamBreak && !effectorSim.hasAlgae) {
+        if(!effectorSim.simulatedBeamBreak && !effectorSim.hasAlgae) {
             Pose3d nearestAlgaePose = getClosestAlgae();
             if (Math.hypot(nearestAlgaePose.getX() - drivetrain.getState().Pose.getX(), nearestAlgaePose.getY() - drivetrain.getState().Pose.getY()) < 1) {
                 if (nearestAlgaePose.getZ() == 0.9) {

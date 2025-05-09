@@ -117,7 +117,7 @@ public class SimulatePlacingCoralL3Extra extends Command {
     Rotation3d rotation = getRotationAngle();
     Pose3d coralToUse = new Pose3d(coralPose.getX(), coralPose.getY(), 1.2, rotation);
     canPlace = true;
-    if (effectorSim.simulatedBeamBreak) {
+    if (effectorSim.simulatedBeamBreak && !effector.reefCoral.contains(coralToUse)) {
       effector.reefCoral.add(coralToUse);
       effectorSim.simulatedBeamBreak = false;
       effector.updateArray();
@@ -131,6 +131,7 @@ public class SimulatePlacingCoralL3Extra extends Command {
     } else if (DriverStation.isTeleopEnabled()) {
       effector.simulatedRedScore = effector.simulatedRedScore += 4;
     }
+    effector.redL3Coral += 1;
   }
 
   // Returns true when the command should end.
