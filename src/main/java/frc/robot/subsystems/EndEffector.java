@@ -13,6 +13,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -39,8 +41,8 @@ public class EndEffector extends SubsystemBase {
     public int blueProcessorAlgae = 0, blueL4Coral = 0, blueL3Coral = 0, blueL2Coral = 0;
     public int simulatedRedScore = 0;
     public int redProcessorAlgae = 0, redL4Coral = 0, redL3Coral = 0, redL2Coral = 0;
-    public boolean redCoralRP = false, redCoopRequirement = false;
-    public boolean blueCoralRP = false, blueCoopRequirement = false;
+    public boolean redCoralRP = false;
+    public boolean blueCoralRP = false;
     boolean coopertitionAchieved = false;
 
     public List<Pose3d> reefCoral = new ArrayList<>();
@@ -54,6 +56,18 @@ public class EndEffector extends SubsystemBase {
     
     StructArrayPublisher<Pose3d> algaePublisher = NetworkTableInstance.getDefault()
     .getStructArrayTopic("AlgaePositions", Pose3d.struct).publish();
+
+    IntegerPublisher blueL2 = NetworkTableInstance.getDefault().getIntegerTopic("Scoring/Blue L2").publish();
+    IntegerPublisher blueL3 = NetworkTableInstance.getDefault().getIntegerTopic("Scoring/Blue L3").publish();
+    IntegerPublisher blueL4 = NetworkTableInstance.getDefault().getIntegerTopic("Scoring/Blue L4").publish();
+    IntegerPublisher redL2 = NetworkTableInstance.getDefault().getIntegerTopic("Scoring/Red L2").publish();
+    IntegerPublisher redL3 = NetworkTableInstance.getDefault().getIntegerTopic("Scoring/Red L3").publish();
+    IntegerPublisher redL4 = NetworkTableInstance.getDefault().getIntegerTopic("Scoring/Red L4").publish();
+    IntegerPublisher blueScorePublisher = NetworkTableInstance.getDefault().getIntegerTopic("Scoring/Blue Alliance Score").publish();
+    IntegerPublisher redScorePublisher = NetworkTableInstance.getDefault().getIntegerTopic("Scoring/Red Alliance Score").publish();
+    BooleanPublisher coopertitionPublisher = NetworkTableInstance.getDefault().getBooleanTopic("Scoring/Coopertition Achieved").publish();
+    BooleanPublisher blueCoralRPPublisher = NetworkTableInstance.getDefault().getBooleanTopic("Scoring/Blue Coral RP").publish();
+    BooleanPublisher redCoralRPPublisher = NetworkTableInstance.getDefault().getBooleanTopic("Scoring/Red Coral RP").publish();
     
     public EndEffector() {
         setMotorSettings();
@@ -78,9 +92,7 @@ public class EndEffector extends SubsystemBase {
         redL4Coral = 0;
         simulatedBeamBreak = true;
         redCoralRP = false;
-        redCoopRequirement = false;
         blueCoralRP = false;
-        blueCoopRequirement = false;
         coopertitionAchieved = false;
     }
 
@@ -228,17 +240,17 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putNumber("endEffectorPivotPos", effectorPivot.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("conveyorRPM", conveyor.getRotorVelocity().getValueAsDouble());
         SmartDashboard.putBoolean("coralLoadedInEffector", simulatedBeamBreak);
-        SmartDashboard.putNumber("Blue Alliance Score", simulatedBlueScore);
-        SmartDashboard.putNumber("Red Alliance Score", simulatedRedScore);
-        SmartDashboard.putNumber("Blue L2", blueL2Coral);
-        SmartDashboard.putNumber("Blue L3", blueL3Coral);
-        SmartDashboard.putNumber("Blue L4", blueL4Coral);
-        SmartDashboard.putNumber("Red L2", redL2Coral);
-        SmartDashboard.putNumber("Red L3", redL3Coral);
-        SmartDashboard.putNumber("Red L4", redL4Coral);
-        SmartDashboard.putBoolean("Blue Coral RP", blueCoralRP);
-        SmartDashboard.putBoolean("Red Coral RP", redCoralRP);
-        SmartDashboard.putBoolean("Coopertition Achieved", coopertitionAchieved);
+        blueScorePublisher.set(simulatedBlueScore);
+        redScorePublisher.set(simulatedRedScore);
+        blueL2.set(blueL2Coral);
+        blueL3.set(blueL3Coral);
+        blueL4.set(blueL4Coral);
+        redL2.set(redL2Coral);
+        redL3.set(redL3Coral);
+        redL4.set(redL4Coral);
+        coopertitionPublisher.set(coopertitionAchieved);
+        blueCoralRPPublisher.set(blueCoralRP);
+        redCoralRPPublisher.set(redCoralRP);
 
         publisher.set(reefArray);
         algaePublisher.set(algaeArray);

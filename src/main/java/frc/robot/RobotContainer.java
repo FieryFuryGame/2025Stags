@@ -45,7 +45,6 @@ import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.EndEffectorSim;
 import frc.robot.subsystems.EndEffectorSimExtra;
 import frc.robot.subsystems.ExtraDriver;
-import frc.robot.subsystems.PhotonSim;
 
 public class RobotContainer {
 
@@ -72,7 +71,7 @@ public class RobotContainer {
     public final EndEffector effector = new EndEffector();
     public final BargeController bargeController = new BargeController(effector);
     public final Climber climber = new Climber();
-    public final PhotonSim photonSim = new PhotonSim(drivetrain);
+    //public final PhotonSim photonSim = new PhotonSim(drivetrain);
     public final ElevatorSim elevatorSim = new ElevatorSim();
     public final EndEffectorSim effectorSim = new EndEffectorSim(effector, elevatorSim, drivetrain);
     public final ExtraDriver extraDriver = ExtraDriverConstants.createDrivetrain();
@@ -149,7 +148,6 @@ public class RobotContainer {
         Constants.OperatorConstants.operatorController.b().onTrue(new EjectExtra(effector, effectorSimExtra, elevatorSimExtra, extraDriver, bargeController));
         Constants.OperatorConstants.operatorController.x().onTrue(new SimulateAlgaeIntakeExtra(effector, effectorSimExtra, elevatorSimExtra, extraDriver));
         
-
         // Pathfinding control
         Constants.OperatorConstants.driverController.leftBumper().onTrue(new AlignToBranch(drivetrain, "Left"));
         Constants.OperatorConstants.driverController.rightBumper().onTrue(new AlignToBranch(drivetrain, "Right"));
