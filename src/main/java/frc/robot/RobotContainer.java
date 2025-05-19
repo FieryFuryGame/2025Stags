@@ -15,6 +15,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,11 +41,11 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSim;
 import frc.robot.subsystems.ElevatorSimExtra;
-import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.EndEffectorSim;
 import frc.robot.subsystems.EndEffectorSimExtra;
 import frc.robot.subsystems.ExtraDriver;
+import frc.robot.subsystems.ElevatorSim.ElevatorState;
 
 public class RobotContainer {
 
@@ -67,7 +68,6 @@ public class RobotContainer {
     Field2d field2d = new Field2d();
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final ElevatorSubsystem elevator = new ElevatorSubsystem();
     public final EndEffector effector = new EndEffector();
     public final BargeController bargeController = new BargeController(effector);
     public final Climber climber = new Climber();
@@ -82,11 +82,13 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+        DriverStation.silenceJoystickConnectionWarning(true);
+
         // Elevator Commands
-        NamedCommands.registerCommand("L1", elevatorSim.simulateSetpoint(0));
-        NamedCommands.registerCommand("L2", elevatorSim.simulateSetpoint(40));
-        NamedCommands.registerCommand("L3", elevatorSim.simulateSetpoint(64));
-        NamedCommands.registerCommand("L4", elevatorSim.simulateSetpoint(100));
+        NamedCommands.registerCommand("L1", elevatorSim.setState(ElevatorState.GROUND));
+        NamedCommands.registerCommand("L2", elevatorSim.setState(ElevatorState.L2));
+        NamedCommands.registerCommand("L3", elevatorSim.setState(ElevatorState.L3));
+        NamedCommands.registerCommand("L4", elevatorSim.setState(ElevatorState.L4));
         NamedCommands.registerCommand("waitForL1", new WaitUntilCommand(elevatorSim.isL1));
         NamedCommands.registerCommand("waitForL4", new WaitUntilCommand(elevatorSim.isL4));
 
@@ -149,23 +151,23 @@ public class RobotContainer {
         Constants.OperatorConstants.operatorController.x().onTrue(new SimulateAlgaeIntakeExtra(effector, effectorSimExtra, elevatorSimExtra, extraDriver));
         
         // Pathfinding control
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(new AlignToBranch(drivetrain, "Left"));
-        Constants.OperatorConstants.driverController.rightBumper().onTrue(new AlignToBranch(drivetrain, "Right"));
-        Constants.OperatorConstants.driverController.y().onTrue(new AlignToAlgae(drivetrain));
+        Constants.OperatorConstants.driverController.leftBumper().onTrue(new AlignToBranch(drivetrain, "Left").onlyIf(() -> effector.simulatedBeamBreak));
+        Constants.OperatorConstants.driverController.rightBumper().onTrue(new AlignToBranch(drivetrain, "Right").onlyIf(() -> effector.simulatedBeamBreak));
+        Constants.OperatorConstants.driverController.y().onTrue(new AlignToAlgae(drivetrain).onlyIf(() -> !effectorSim.hasAlgae));
         
         // Elevator Automatic Control    
-        Constants.OperatorConstants.driverController.povUp().onTrue(elevatorSim.simulateSetpoint(64));
-        Constants.OperatorConstants.driverController.povLeft().onTrue(elevatorSim.simulateSetpoint(40));
-        Constants.OperatorConstants.driverController.povRight().onTrue(elevatorSim.simulateSetpoint(100));
-        Constants.OperatorConstants.driverController.povDown().onTrue(elevatorSim.simulateSetpoint(0));
+        Constants.OperatorConstants.driverController.povUp().onTrue(elevatorSim.setState(ElevatorState.L3));
+        Constants.OperatorConstants.driverController.povLeft().onTrue(elevatorSim.setState(ElevatorState.L2));
+        Constants.OperatorConstants.driverController.povRight().onTrue(elevatorSim.setState(ElevatorState.L4));
+        Constants.OperatorConstants.driverController.povDown().onTrue(elevatorSim.setState(ElevatorState.GROUND));
 
         Constants.OperatorConstants.operatorController.povUp().onTrue(elevatorSimExtra.simulateSetpoint(64));
         Constants.OperatorConstants.operatorController.povLeft().onTrue(elevatorSimExtra.simulateSetpoint(40));
         Constants.OperatorConstants.operatorController.povRight().onTrue(elevatorSimExtra.simulateSetpoint(100));
         Constants.OperatorConstants.operatorController.povDown().onTrue(elevatorSimExtra.simulateSetpoint(0));
 
-        Constants.OperatorConstants.driverController.leftTrigger().onTrue(Commands.runOnce(() -> elevatorSim.manualControl = true));
-        Constants.OperatorConstants.driverController.rightTrigger().onTrue(Commands.runOnce(() -> elevatorSim.manualControl = true));
+        Constants.OperatorConstants.driverController.leftTrigger().onTrue(elevatorSim.setState(ElevatorState.MANUAL));
+        Constants.OperatorConstants.driverController.rightTrigger().onTrue(elevatorSim.setState(ElevatorState.MANUAL));
         Constants.OperatorConstants.operatorController.leftTrigger().onTrue(Commands.runOnce(() -> elevatorSimExtra.manualControl = true));
         Constants.OperatorConstants.operatorController.rightTrigger().onTrue(Commands.runOnce(() -> elevatorSimExtra.manualControl = true));
         
