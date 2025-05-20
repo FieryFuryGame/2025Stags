@@ -74,7 +74,6 @@ public class SimulatePlacingCoralL3Extra extends Command {
     double roll = 0;
     double pitch = 0;
     double yaw = 0;
-    System.out.println(nearestPose.getRotation().getDegrees());
     switch ((int) nearestPose.getRotation().getDegrees()) {
       case 119:
         pitch = Units.degreesToRadians(30); // Front Middle

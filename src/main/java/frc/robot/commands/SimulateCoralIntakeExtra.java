@@ -59,7 +59,6 @@ public class SimulateCoralIntakeExtra extends Command {
     Pose2d drivePose = drivetrain.getState().Pose;
     Pose2d nearestPose = getNearest();
     double distance = Math.sqrt(Math.pow((nearestPose.getX() - drivePose.getX()), 2) + Math.pow((nearestPose.getY() - nearestPose.getY()), 2));
-    System.out.println(distance);
     if (distance < 0.5 && !effectorSim.hasAlgae) {
       effectorSim.simulatedBeamBreak = true;
     }

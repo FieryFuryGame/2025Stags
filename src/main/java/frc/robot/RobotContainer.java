@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.LimelightHelpers.PoseEstimate;
-import frc.robot.commands.AlignToAlgae;
 import frc.robot.commands.AlignToBranch;
 import frc.robot.commands.DecideWhereToPlaceCoral;
 import frc.robot.commands.EffectorPivot;
@@ -86,9 +85,13 @@ public class RobotContainer {
 
         // Elevator Commands
         NamedCommands.registerCommand("L1", elevatorSim.setState(ElevatorState.GROUND));
+        NamedCommands.registerCommand("SlowL1", elevatorSim.setState(ElevatorState.GROUNDSLOW));
         NamedCommands.registerCommand("L2", elevatorSim.setState(ElevatorState.L2));
+        NamedCommands.registerCommand("SlowL2", elevatorSim.setState(ElevatorState.L2SLOW));
         NamedCommands.registerCommand("L3", elevatorSim.setState(ElevatorState.L3));
+        NamedCommands.registerCommand("SlowL3L3", elevatorSim.setState(ElevatorState.L3SLOW));
         NamedCommands.registerCommand("L4", elevatorSim.setState(ElevatorState.L4));
+        NamedCommands.registerCommand("SlowL4", elevatorSim.setState(ElevatorState.L4SLOW));
         NamedCommands.registerCommand("waitForL1", new WaitUntilCommand(elevatorSim.isL1));
         NamedCommands.registerCommand("waitForL4", new WaitUntilCommand(elevatorSim.isL4));
 
@@ -108,16 +111,20 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooser("Top 2 L4");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
-        SmartDashboard.putData("Reset Simulation", Commands.runOnce(() -> {
+        SmartDashboard.putData("Reset Simulation", resetSim());
+
+        configureBindings();
+    }
+
+    public Command resetSim() {
+        return Commands.runOnce(() -> {
             effector.reset();
             effectorSim.hasAlgae = false;
             effectorSimExtra.hasAlgae = false;
             effectorSimExtra.simulatedBeamBreak = true;
             drivetrain.resetPose(new Pose2d(7.588, 6.692, Rotation2d.k180deg));
             extraDriver.resetPose(new Pose2d(9.962, 1.322, Rotation2d.kZero));
-        }).ignoringDisable(true));
-
-        configureBindings();
+        }).ignoringDisable(true);
     }
 
     private void configureBindings() {
@@ -146,14 +153,15 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.a().onTrue(new SimulateCoralIntake(drivetrain, effector, effectorSim));
         Constants.OperatorConstants.driverController.b().onTrue(new Eject(effector, effectorSim, elevatorSim, drivetrain, bargeController));
         Constants.OperatorConstants.driverController.x().onTrue(new SimulateAlgaeIntake(effector, effectorSim, elevatorSim, drivetrain));
+        Constants.OperatorConstants.driverController.y().onTrue(Commands.runOnce(() -> effector.simulatedBeamBreak = false));
         Constants.OperatorConstants.operatorController.a().onTrue(new SimulateCoralIntakeExtra(extraDriver, effectorSimExtra));
         Constants.OperatorConstants.operatorController.b().onTrue(new EjectExtra(effector, effectorSimExtra, elevatorSimExtra, extraDriver, bargeController));
         Constants.OperatorConstants.operatorController.x().onTrue(new SimulateAlgaeIntakeExtra(effector, effectorSimExtra, elevatorSimExtra, extraDriver));
+        Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> effectorSimExtra.simulatedBeamBreak = false));
         
         // Pathfinding control
         Constants.OperatorConstants.driverController.leftBumper().onTrue(new AlignToBranch(drivetrain, "Left").onlyIf(() -> effector.simulatedBeamBreak));
         Constants.OperatorConstants.driverController.rightBumper().onTrue(new AlignToBranch(drivetrain, "Right").onlyIf(() -> effector.simulatedBeamBreak));
-        Constants.OperatorConstants.driverController.y().onTrue(new AlignToAlgae(drivetrain).onlyIf(() -> !effectorSim.hasAlgae));
         
         // Elevator Automatic Control    
         Constants.OperatorConstants.driverController.povUp().onTrue(elevatorSim.setState(ElevatorState.L3));
@@ -161,15 +169,15 @@ public class RobotContainer {
         Constants.OperatorConstants.driverController.povRight().onTrue(elevatorSim.setState(ElevatorState.L4));
         Constants.OperatorConstants.driverController.povDown().onTrue(elevatorSim.setState(ElevatorState.GROUND));
 
-        Constants.OperatorConstants.operatorController.povUp().onTrue(elevatorSimExtra.simulateSetpoint(64));
-        Constants.OperatorConstants.operatorController.povLeft().onTrue(elevatorSimExtra.simulateSetpoint(40));
-        Constants.OperatorConstants.operatorController.povRight().onTrue(elevatorSimExtra.simulateSetpoint(100));
-        Constants.OperatorConstants.operatorController.povDown().onTrue(elevatorSimExtra.simulateSetpoint(0));
+        Constants.OperatorConstants.operatorController.povUp().onTrue(elevatorSimExtra.setState(ElevatorState.L3));
+        Constants.OperatorConstants.operatorController.povLeft().onTrue(elevatorSimExtra.setState(ElevatorState.L2));
+        Constants.OperatorConstants.operatorController.povRight().onTrue(elevatorSimExtra.setState(ElevatorState.L4));
+        Constants.OperatorConstants.operatorController.povDown().onTrue(elevatorSimExtra.setState(ElevatorState.GROUND));
 
         Constants.OperatorConstants.driverController.leftTrigger().onTrue(elevatorSim.setState(ElevatorState.MANUAL));
         Constants.OperatorConstants.driverController.rightTrigger().onTrue(elevatorSim.setState(ElevatorState.MANUAL));
-        Constants.OperatorConstants.operatorController.leftTrigger().onTrue(Commands.runOnce(() -> elevatorSimExtra.manualControl = true));
-        Constants.OperatorConstants.operatorController.rightTrigger().onTrue(Commands.runOnce(() -> elevatorSimExtra.manualControl = true));
+        Constants.OperatorConstants.operatorController.leftTrigger().onTrue(elevatorSimExtra.setState(ElevatorState.MANUAL));
+        Constants.OperatorConstants.operatorController.rightTrigger().onTrue(elevatorSimExtra.setState(ElevatorState.MANUAL));
         
         // Fancy logging stuff that fills all the storage on the RIO
         drivetrain.registerTelemetry(logger::telemeterize);

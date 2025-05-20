@@ -17,22 +17,28 @@ public class ElevatorSim extends SubsystemBase {
     Pose3d affector = new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0));
     Pose3d firstStage = new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0));
     Pose3d secondStage = new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0));
+    double elevatorSpeed = 4;
 
     public enum ElevatorState {
-        GROUND(true, 0, "kGroundSetpoint"),
-        L2(true, 40, "kL2Setpoint"),
-        L3(true, 64, "kL3Setpoint"),
-        L4(true, 100, "kL4Setpoint"),
-        MANUAL(false, 0, "kManualControl");
+        GROUND(true, 0, 4, "kGroundSetpoint"),
+        GROUNDSLOW(true, 0, 1, "kGroundSetpointSlow"),
+        L2(true, 40, 4, "kL2Setpoint"),
+        L2SLOW(true, 40, 1, "kL2SetpointSlow"),
+        L3(true, 64, 4, "kL3Setpoint"),
+        L3SLOW(true, 64, 1, "kL3SetpointSlow"),
+        L4(true, 100, 4, "kL4Setpoint"),
+        L4SLOW(true, 100, 1, "kL4SetpointSlow"),
+        MANUAL(false, 0, 4, "kManualControl");
 
         boolean isSetpoint;
         double setpoint;
+        double speed;
         String stateTitle;
-        
 
-        ElevatorState(boolean isSetpoint, double setpoint, String stateTitle) {
+        ElevatorState(boolean isSetpoint, double setpoint, double speed, String stateTitle) {
             this.isSetpoint = isSetpoint;
             this.setpoint = setpoint;
+            this.speed = speed;
             this.stateTitle = stateTitle;
         }
 
@@ -46,6 +52,10 @@ public class ElevatorSim extends SubsystemBase {
 
         public String getTitle() {
             return stateTitle;
+        }
+
+        public double getSpeed() {
+            return speed;
         }
 
     }
@@ -77,7 +87,7 @@ public class ElevatorSim extends SubsystemBase {
 
     public void updatePoses() {
         if (DriverStation.isEnabled()) {
-            if (state == ElevatorState.MANUAL) {
+            if (!state.isSetpoint()) {
                 if (Constants.OperatorConstants.driverController.leftTrigger().getAsBoolean() && percentageUp > 0) {
                     percentageUp -= 1;
                 }
@@ -89,9 +99,9 @@ public class ElevatorSim extends SubsystemBase {
                     percentageUp += 1;
                 }
                 if (goalPercentage < percentageUp) {
-                    percentageUp -= 4;
+                    percentageUp -= elevatorSpeed;
                 } else if (goalPercentage > percentageUp) {
-                    percentageUp += 4;
+                    percentageUp += elevatorSpeed;
                 }
             }
         }
@@ -104,6 +114,7 @@ public class ElevatorSim extends SubsystemBase {
         this.state = state;
 
         if (state.isSetpoint()) {
+            elevatorSpeed = state.getSpeed();
             goalPercentage = state.getSetpoint();
         }
     }
