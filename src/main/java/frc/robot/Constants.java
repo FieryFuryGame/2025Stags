@@ -25,9 +25,9 @@ public final class Constants {
     public static final int ElevatorMotorBID = 9;
     public static final int ElevatorMotorAID = 10;
     // PID for motor B
-    public static final double kS = 0.25, kV = 0.12, kA = 0.01, kP = 4.8, kI = 0, kD = 0.1, kG = 0.3;
+    public static final double kS = 0.25, kV = 0.12, kA = 0.01, kP = 4.8, kI = 0, kD = 0.332, kG = 0.3;
     // Motion Magic Config B
-    public static final double mmCruiseVelocity = 120, mmAccel = 280, mmJerk = 1600;
+    public static final double mmCruiseVelocity = 93, mmAccel = 450, mmJerk = 1600;
   }
 
   public static class EndEffectorConstants {

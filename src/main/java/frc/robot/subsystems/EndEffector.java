@@ -18,6 +18,40 @@ import frc.robot.Constants;
 
 public class EndEffector extends SubsystemBase {
 
+    public enum WheelState {
+        Idle("kIdle", 0, 0),
+        IntakeCoral("kCoralIntake", -7, -6),
+        IntakeAlgae("kAlgaeIntake", 6, 6),
+        Eject("kEject", -12, 0);
+
+        String title;
+        double wheelVoltage;
+        double conveyorVoltage;
+
+        WheelState(String title, double wheelVoltage, double conveyorVoltage) {
+            this.title = title;
+            this.wheelVoltage = wheelVoltage;
+            this.conveyorVoltage = conveyorVoltage;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public double getConveyorVoltage() {
+            return conveyorVoltage;
+        }
+
+        public double getWheelVoltage() {
+            return wheelVoltage;
+        }
+
+    }
+
+    public WheelState wheelState = WheelState.Idle;
+
+    
+
     TalonFX effectorWheels = new TalonFX(Constants.EndEffectorConstants.EffectorWheelsID, "Canivore");
     TalonFX effectorPivot = new TalonFX(Constants.EndEffectorConstants.EffectorPivotID, "Canivore");
     TalonFX conveyor = new TalonFX(Constants.EndEffectorConstants.ConveyorID, "Canivore");
@@ -111,11 +145,24 @@ public class EndEffector extends SubsystemBase {
         }
     }
 
+    public void handleWheelState(WheelState state) {
+        this.wheelState = state;
+        setConveyorVoltage(state.getConveyorVoltage());
+        setWheelVoltage(state.getWheelVoltage());
+    }
+
+    public Command setWheelState(WheelState state) {
+        return runOnce(() -> handleWheelState(state));
+    }
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("endEffectorPivotPos", effectorPivot.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("conveyorRPM", conveyor.getRotorVelocity().getValueAsDouble());
         SmartDashboard.putBoolean("coralLoadedInEffector", isCoralLoaded());
+        SmartDashboard.putNumber("EffectorCurrent", conveyor.getTorqueCurrent().getValueAsDouble());
+
+        SmartDashboard.putString("effectorWheelState", wheelState.getTitle());
     }
     
 }

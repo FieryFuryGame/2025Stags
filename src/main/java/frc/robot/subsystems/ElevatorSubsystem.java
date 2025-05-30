@@ -27,10 +27,47 @@ public class ElevatorSubsystem extends SubsystemBase {
     public BooleanSupplier isL1 = () -> elevatorMotor.getPosition().getValueAsDouble() < 2;
     public BooleanSupplier isL4 = () -> elevatorMotor.getPosition().getValueAsDouble() > 96.75;
 
+    public enum ElevatorState {
+        GROUND("kGround", 0, true),
+        L2("kL2", 34, true),
+        L3("kL3", 53, true),
+        L4("kL4", 79, true),
+        MANUAL("kManual", 0, false);
+
+        String title;
+        double position;
+        boolean isSetpoint;
+
+        ElevatorState(String title, double position, boolean isSetpoint) {
+            this.title = title;
+            this.position = position;
+            this.isSetpoint = isSetpoint;
+        }
+
+        public String getTitle() {
+            return this.title;
+        }
+
+        public double getPosition() {
+            return this.position;
+        }
+
+        public boolean isSetpoint() {
+            return this.isSetpoint;
+        }
+    }
+
+    public ElevatorState state = ElevatorState.MANUAL;
+
     public ElevatorSubsystem() {
         setMotorSettings();
         elevatorMotor.setPosition(0.0, 1.0);
         elevatorMotorB.setPosition(0.0, 1.0);
+
+        SmartDashboard.putData("Zero Elevator", runOnce(() -> {
+            elevatorMotor.setPosition(0.0, 1.0);
+            elevatorMotorB.setPosition(0.0, 1.0);
+        }));
     }
     
     public void setMotorSettings() {
@@ -76,53 +113,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
     VelocityVoltage voltageOut = new VelocityVoltage(0);
 
-    public void setLevelOne() {
-        elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
-        elevatorMotorB.setControl(positionVoltage.withPosition(0).withSlot(0));
-    }
-
-    public void setLevelTwo() {
-        elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(42).withSlot(0));
-        elevatorMotorB.setControl(positionVoltage.withPosition(42).withSlot(0));
-    }
-
-    public void setLevelThree() {
-        elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(66).withSlot(0));
-        elevatorMotorB.setControl(positionVoltage.withPosition(66).withSlot(0));
-    }
-
-    public void setLevelFour() {
-        elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(98.5).withSlot(0));
-        elevatorMotorB.setControl(positionVoltage.withPosition(98.5).withSlot(0));
-    }
-
-    public void setLevelAlgaeLow() {
-        elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(67).withSlot(0));
-        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
-    }
-    
-    public void setLevelAlgaeHigh() {
-        elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(113).withSlot(0));
-        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
-    }
-
-    public void setLevelAlgaeLowPrep() {
-        elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(79).withSlot(0));
-        //elevatorMotor.setControl(positionVoltage.withPosition(0).withSlot(0));
-    }
-
-    public void setLevelAlgaeHighPrep() {
-        elevatorMotor.stopMotor();
-        elevatorMotor.setControl(positionVoltage.withPosition(125).withSlot(0));
-    }
-
     public Command setVoltage(double power) {
         return runOnce(() -> {
             elevatorMotor.setControl(voltageOut.withSlot(1).withVelocity(0).withFeedForward(-power));
@@ -137,6 +127,18 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
+    public void handleState(ElevatorState state) {
+        this.state = state;
+        if (state.isSetpoint()) {
+            elevatorMotor.setControl(positionVoltage.withPosition(state.getPosition()).withSlot(0));
+            elevatorMotorB.setControl(positionVoltage.withPosition(state.getPosition()).withSlot(0));
+        }
+    }
+
+    public Command setState(ElevatorState state) {
+        return runOnce(() -> handleState(state));
+    }
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("elevatorAMotorPos", elevatorMotor.getPosition().getValueAsDouble());
@@ -144,6 +146,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("elevatorBMotorPos", elevatorMotorB.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("elevatorBRPM", elevatorMotorB.getRotorVelocity().getValueAsDouble());
+
+        SmartDashboard.putString("elevatorState", state.getTitle());
     }
     
 

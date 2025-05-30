@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.commands.AlignToReef;
 import frc.robot.commands.EffectorPivot;
@@ -31,6 +32,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.ElevatorSubsystem.ElevatorState;
 
 public class RobotContainer {
 
@@ -38,6 +40,8 @@ public class RobotContainer {
     private double MaxAngularRate = RotationsPerSecond.of(1.6).in(RadiansPerSecond); // 1.6 rotations per second max angular velocity
 
     PoseEstimate llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+
+    CommandXboxController testController = new CommandXboxController(2);
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -59,10 +63,10 @@ public class RobotContainer {
 
     public RobotContainer() {
         // Elevator Commands
-        NamedCommands.registerCommand("L1", Commands.runOnce(() -> elevator.setLevelOne()));
-        NamedCommands.registerCommand("L2", Commands.runOnce(() -> elevator.setLevelTwo()));
-        NamedCommands.registerCommand("L3", Commands.runOnce(() -> elevator.setLevelThree()));
-        NamedCommands.registerCommand("L4", Commands.runOnce(() -> elevator.setLevelFour()));
+        NamedCommands.registerCommand("L1", elevator.setState(ElevatorState.GROUND));
+        NamedCommands.registerCommand("L2", elevator.setState(ElevatorState.L2));
+        NamedCommands.registerCommand("L3", elevator.setState(ElevatorState.L3));
+        NamedCommands.registerCommand("L4", elevator.setState(ElevatorState.L4));
         NamedCommands.registerCommand("waitForL1", new WaitUntilCommand(elevator.isL4));
         NamedCommands.registerCommand("waitForL4", new WaitUntilCommand(elevator.isL4));
 
@@ -107,6 +111,7 @@ public class RobotContainer {
         // Miscellaneous
         Constants.OperatorConstants.driverController.x().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
         Constants.OperatorConstants.driverController.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
         /*
         Constants.OperatorConstants.driverController.povDown().onTrue(climber.moveToSetpointCommand(0.0)); // Initial Position
         Constants.OperatorConstants.driverController.povLeft().onTrue(climber.moveToSetpointCommand(0.0)); // Preparing Position
@@ -121,23 +126,31 @@ public class RobotContainer {
         */
         // Elevator Manual Control
         Constants.OperatorConstants.operatorController.leftTrigger()
-            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(2)))
+            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(2)).andThen(elevator.setState(ElevatorState.MANUAL)))
             .onFalse(elevator.setVoltage(0));
         Constants.OperatorConstants.operatorController.rightTrigger()
-            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-2)))
+            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-2)).andThen(elevator.setState(ElevatorState.MANUAL)))
             .onFalse(elevator.setVoltage(0));
         
         // Elevator Automatic Control    
-        Constants.OperatorConstants.operatorController.povUp().onTrue(Commands.runOnce(() -> elevator.setLevelThree()));
-        Constants.OperatorConstants.operatorController.povLeft().onTrue(Commands.runOnce(() -> elevator.setLevelTwo()));
-        Constants.OperatorConstants.operatorController.povRight().onTrue(Commands.runOnce(() -> elevator.setLevelFour()));
-        Constants.OperatorConstants.operatorController.povDown().onTrue(Commands.runOnce(() -> elevator.setLevelOne()));
+        Constants.OperatorConstants.operatorController.povUp().onTrue(elevator.setState(ElevatorState.L3));
+        Constants.OperatorConstants.operatorController.povLeft().onTrue(elevator.setState(ElevatorState.L2));
+        Constants.OperatorConstants.operatorController.povRight().onTrue(elevator.setState(ElevatorState.L4));
+        Constants.OperatorConstants.operatorController.povDown().onTrue(elevator.setState(ElevatorState.GROUND));
 
         // Effector Controls
         Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
         Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));
         Constants.OperatorConstants.operatorController.x().whileTrue(new IntakeAlgae(effector));
         Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> new EffectorPivot(effector).execute()));
+        /*
+        testController.leftTrigger()
+            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(12)))
+            .onFalse(elevator.setVoltage(0));
+        testController.rightTrigger()
+            .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-12)))
+            .onFalse(elevator.setVoltage(0));
+        */
         
         // Fancy logging stuff that fills all the storage on the RIO
         drivetrain.registerTelemetry(logger::telemeterize);
