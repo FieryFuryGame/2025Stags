@@ -161,7 +161,6 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putNumber("conveyorRPM", conveyor.getRotorVelocity().getValueAsDouble());
         SmartDashboard.putBoolean("coralLoadedInEffector", isCoralLoaded());
         SmartDashboard.putNumber("EffectorCurrent", conveyor.getTorqueCurrent().getValueAsDouble());
-
         SmartDashboard.putString("effectorWheelState", wheelState.getTitle());
     }
     

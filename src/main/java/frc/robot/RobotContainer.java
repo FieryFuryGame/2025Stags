@@ -19,20 +19,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.commands.AlignToReef;
 import frc.robot.commands.EffectorPivot;
-import frc.robot.commands.EjectCoral;
-import frc.robot.commands.LoadCoral;
-import frc.robot.commands.IntakeAlgae;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorState;
+import frc.robot.subsystems.EndEffector.WheelState;
 
 public class RobotContainer {
 
@@ -71,11 +71,11 @@ public class RobotContainer {
         NamedCommands.registerCommand("waitForL4", new WaitUntilCommand(elevator.isL4));
 
         // Effector Commands
-        NamedCommands.registerCommand("dispenseCoral", effector.setWheelVoltageCommand(-12));
+        NamedCommands.registerCommand("dispenseCoral", effector.setWheelState(WheelState.Eject).asProxy());
         NamedCommands.registerCommand("waitForCoral", new WaitUntilCommand(effector.checkBeam));
-        NamedCommands.registerCommand("loadCoral", effector.setWheelVoltageCommand(-7).andThen(effector.setConveyorVoltageCommand(-6)));
-        NamedCommands.registerCommand("stopEffector", effector.setWheelVoltageCommand(0).andThen(effector.setConveyorVoltageCommand(0.0)));
-        NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).execute()));
+        NamedCommands.registerCommand("loadCoral", effector.setWheelState(WheelState.IntakeCoral).asProxy());
+        NamedCommands.registerCommand("stopEffector", effector.setWheelState(WheelState.Idle));
+        NamedCommands.registerCommand("pivotEffector", Commands.runOnce(() -> new EffectorPivot(effector).asProxy().execute()));
 
         // Swerve Commands
         NamedCommands.registerCommand("zeroGyro", Commands.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -139,9 +139,9 @@ public class RobotContainer {
         Constants.OperatorConstants.operatorController.povDown().onTrue(elevator.setState(ElevatorState.GROUND));
 
         // Effector Controls
-        Constants.OperatorConstants.operatorController.a().whileTrue(new LoadCoral(effector));
-        Constants.OperatorConstants.operatorController.b().whileTrue(new EjectCoral(effector));
-        Constants.OperatorConstants.operatorController.x().whileTrue(new IntakeAlgae(effector));
+        Constants.OperatorConstants.operatorController.a().whileTrue(effector.setWheelState(WheelState.IntakeCoral).onlyIf(() -> !effector.checkBeam.getAsBoolean())).onFalse(effector.setWheelState(WheelState.Idle));
+        Constants.OperatorConstants.operatorController.b().whileTrue(effector.setWheelState(WheelState.Eject)).onFalse(effector.setWheelState(WheelState.Idle));
+        Constants.OperatorConstants.operatorController.x().whileTrue(effector.setWheelState(WheelState.IntakeAlgae)).onFalse(effector.setWheelState(WheelState.Idle));
         Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> new EffectorPivot(effector).execute()));
         /*
         testController.leftTrigger()
@@ -151,6 +151,11 @@ public class RobotContainer {
             .onTrue(elevator.stopElevator().andThen(elevator.setVoltage(-12)))
             .onFalse(elevator.setVoltage(0));
         */
+
+        new Trigger(effector.checkBeam)
+            .and(() -> effector.wheelState == WheelState.IntakeCoral)
+            .onTrue(new WaitCommand(0.2)
+            .andThen(effector.setWheelState(WheelState.Idle)));
         
         // Fancy logging stuff that fills all the storage on the RIO
         drivetrain.registerTelemetry(logger::telemeterize);
