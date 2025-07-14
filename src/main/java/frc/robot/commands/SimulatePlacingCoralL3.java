@@ -112,6 +112,7 @@ public class SimulatePlacingCoralL3 extends Command {
   @Override
   public void execute() {
     coralPose = new Pose3d(getNearestBranch());
+    nearestPose = getNearestBranch();
     Rotation3d rotation = getRotationAngle();
     Pose3d coralToUse = new Pose3d(coralPose.getX(), coralPose.getY(), 1.2, rotation);
     canPlace = true;

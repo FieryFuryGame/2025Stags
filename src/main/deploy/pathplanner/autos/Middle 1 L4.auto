@@ -42,37 +42,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "pivotEffector"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "dispenseCoral"
+                  "name": "dispenseL4Coral"
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopEffector"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "pivotEffector"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.7
+                  "waitTime": 1.7
                 }
               }
             ]
@@ -85,7 +61,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L3"
+                  "name": "L2"
                 }
               },
               {
@@ -108,18 +84,36 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "intakeAlgae"
+                }
+              },
+              {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.6
+                  "waitTime": 1.0
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "pivotEffector"
+                  "name": "L1"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Middle 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ejectAlgae"
           }
         }
       ]

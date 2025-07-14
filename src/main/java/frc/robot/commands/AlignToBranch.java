@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -61,10 +60,10 @@ public class AlignToBranch extends Command {
             }
 
             if (pathIsFine) {
-                double currentVelocity = drivetrain.getState().Speeds.vxMetersPerSecond + drivetrain.getState().Speeds.vyMetersPerSecond;
                 List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(drivePose, nearestBranch);
                 PathPlannerPath path = new PathPlannerPath(waypoints, constraints, 
-                    new IdealStartingState(currentVelocity, Rotation2d.fromRadians(drivetrain.getState().Speeds.omegaRadiansPerSecond)), 
+                    //new IdealStartingState(currentVelocity, Rotation2d.fromRadians(drivetrain.getState().Speeds.omegaRadiansPerSecond))
+                    null, 
                     new GoalEndState(0.0, nearestBranch.getRotation())
                 );
                 path.preventFlipping = true;

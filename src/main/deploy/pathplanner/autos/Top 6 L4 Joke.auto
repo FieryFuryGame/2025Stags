@@ -74,12 +74,6 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "loadCoral"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "L4"
                 }
               }
@@ -134,12 +128,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "loadCoral"
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -200,12 +188,6 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "loadCoral"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "L4"
                 }
               }
@@ -260,12 +242,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "loadCoral"
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -326,12 +302,6 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "loadCoral"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "L4"
                 }
               }
@@ -389,12 +359,6 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "loadCoral"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "L4"
                 }
               }
@@ -443,12 +407,6 @@
           "type": "path",
           "data": {
             "pathName": "Top 14"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "loadCoral"
           }
         }
       ]

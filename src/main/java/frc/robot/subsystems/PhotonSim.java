@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.List;
 
 import org.photonvision.PhotonCamera;
@@ -17,11 +20,14 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,8 +39,12 @@ public class PhotonSim extends SubsystemBase {
     CommandSwerveDrivetrain drivetrain;
 
     VisionSystemSim visionSim = new VisionSystemSim("vision");
-    PhotonCamera camera = new PhotonCamera("frontcam");
-    PhotonCameraSim cameraSim;
+    PhotonCamera leftFrontCamera = new PhotonCamera("left-front");
+    PhotonCameraSim leftFrontCameraSim;
+    PhotonCamera rightFrontCamera = new PhotonCamera("right-front");
+    PhotonCameraSim rightFrontCameraSim;
+    StructPublisher<Pose3d> leftCameraPositionPublisher = NetworkTableInstance.getDefault().getStructTopic("Left Front Camera Position", Pose3d.struct).publish();
+    StructPublisher<Pose3d> rightCameraPositionPublisher = NetworkTableInstance.getDefault().getStructTopic("Right Front Camera Position", Pose3d.struct).publish();
 
     public int tid = 0;
 
@@ -55,19 +65,25 @@ public class PhotonSim extends SubsystemBase {
         visionSim.addAprilTags(AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField));
 
         SimCameraProperties cameraProp = new SimCameraProperties();
-        cameraProp.setCalibration(1280, 800, Rotation2d.fromDegrees(100));
-        cameraProp.setFPS(100);
+        cameraProp.setCalibration(1280, 800, Rotation2d.fromDegrees(70));
+        cameraProp.setFPS(120);
         cameraProp.setAvgLatencyMs(35);
         cameraProp.setLatencyStdDevMs(5);
 
-        cameraSim = new PhotonCameraSim(camera, cameraProp);
-        Translation3d robotToCameraTrl = new Translation3d(0.1, 0, 0.5);
-        Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(0), 0);
+        leftFrontCameraSim = new PhotonCameraSim(leftFrontCamera, cameraProp);
+        Translation3d robotToCameraTrl = new Translation3d(0.28, 0.28, Meters.convertFrom(7.5, Inches));
+        Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-10));
         Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
+        leftFrontCameraSim.enableDrawWireframe(false);
+        visionSim.addCamera(leftFrontCameraSim, robotToCamera);
 
-        cameraSim.enableDrawWireframe(false);
+        rightFrontCameraSim = new PhotonCameraSim(rightFrontCamera, cameraProp);
+        robotToCameraTrl = new Translation3d(0.28, -0.28, Meters.convertFrom(7.5, Inches));
+        robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), Math.toRadians(10));
+        robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
+        rightFrontCameraSim.enableDrawWireframe(false);
+        visionSim.addCamera(rightFrontCameraSim, robotToCamera);
 
-        visionSim.addCamera(cameraSim, robotToCamera);
     }
 
     public String getTriggerPressed(String trigger) {
@@ -123,8 +139,10 @@ public class PhotonSim extends SubsystemBase {
     @Override
     public void periodic() {
         visionSim.update(drivetrain.getState().Pose);
+        leftCameraPositionPublisher.set(visionSim.getCameraPose(leftFrontCameraSim).get());
+        rightCameraPositionPublisher.set(visionSim.getCameraPose(rightFrontCameraSim).get());
 
-        PhotonPipelineResult targets = camera.getLatestResult();
+        PhotonPipelineResult targets = leftFrontCamera.getLatestResult();
 
         if (targets.hasTargets()) {
             SmartDashboard.putNumber("result", targets.getBestTarget().fiducialId);
