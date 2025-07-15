@@ -2,6 +2,9 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -9,14 +12,21 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.therekrab.autopilot.APTarget;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Time;
@@ -28,6 +38,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
@@ -55,6 +66,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /** Swerve request to apply during robot-centric path following */
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
+
+    private final SwerveRequest.FieldCentricFacingAngle autoDrive = new FieldCentricFacingAngle()
+        .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)
+        .withDriveRequestType(DriveRequestType.Velocity)
+        .withHeadingPID(15, 0, 0.5);
+
+    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
+    List<Pose2d> blueLeftPoses = new ArrayList<Pose2d>();
+    List<Pose2d> blueRightPoses = new ArrayList<Pose2d>();
+    List<Pose2d> redLeftPoses = new ArrayList<Pose2d>();
+    List<Pose2d> redRightPoses = new ArrayList<Pose2d>();
 
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
@@ -117,6 +140,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         getState().Pose);
         configureAutoBuilder();
 
+        addLeftPoses();
+        addRightPoses();
+
         SmartDashboard.putData("Toggle Pathfinding", runOnce(() -> togglePathfind()).ignoringDisable(true));
     }
 
@@ -142,6 +168,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+
+        addLeftPoses();
+        addRightPoses();
+
         configureAutoBuilder();
     }
 
@@ -175,6 +205,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+
+        addLeftPoses();
+        addRightPoses();
+
         configureAutoBuilder();
     }
 
@@ -218,6 +252,64 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> this.setControl(requestSupplier.get()));
     }
 
+    APTarget target = new APTarget(new Pose2d());
+
+    public Pose2d getClosestLeftBranch() {
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        Pose2d branchPose = new Pose2d();
+        if (alliance.isPresent()) {
+            if (alliance.get() == Alliance.Blue) {
+                branchPose = getState().Pose.nearest(blueLeftPoses);
+            } else if (alliance.get() == Alliance.Red) {
+                branchPose = getState().Pose.nearest(redLeftPoses);
+            } else {
+                branchPose = new Pose2d();
+            }
+        }
+        return branchPose;
+    }
+
+    public Pose2d getClosestRightBranch() {
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        Pose2d branchPose = new Pose2d();
+        if (alliance.isPresent()) {
+            if (alliance.get() == Alliance.Blue) {
+                branchPose = getState().Pose.nearest(blueRightPoses);
+            } else if (alliance.get() == Alliance.Red) {
+                branchPose = getState().Pose.nearest(redRightPoses);
+            } else {
+                branchPose = new Pose2d();
+            }
+        }
+        return branchPose;
+    }
+
+    public void setTargetToClosestLeftBranch() {
+        target = convertPoseToTarget(getClosestLeftBranch());
+    }
+
+    public void setTargetToClosestRightBranch() {
+        target = convertPoseToTarget(getClosestRightBranch());
+    }
+
+    public Command alignmentCommand = run(() -> {
+        Translation2d velocity = new Translation2d(getState().Speeds.vxMetersPerSecond, getState().Speeds.vyMetersPerSecond).rotateBy(getState().Pose.getRotation());
+        Pose2d pose2d = getState().Pose;
+
+        Transform2d output = Constants.AutopilotConstants.autopilot.calculate(pose2d, velocity, target);
+
+        double x = output.getX();
+        double y = output.getY();
+        Rotation2d heading = output.getRotation();
+
+        setControl(autoDrive
+            .withVelocityX(x)
+            .withVelocityY(y)
+            .withTargetDirection(heading)
+        );
+    }).until(() -> Constants.AutopilotConstants.autopilot.atTarget(getState().Pose, target))
+    .finallyDo(this::stop);
+
     /**
      * Runs the SysId Quasistatic test in the given direction for the routine
      * specified by {@link #m_sysIdRoutineToApply}.
@@ -229,6 +321,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.quasistatic(direction);
     }
 
+    public void stop() {
+        setControl(brake);
+    }
+
     /**
      * Runs the SysId Dynamic test in the given direction for the routine
      * specified by {@link #m_sysIdRoutineToApply}.
@@ -238,6 +334,41 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
+    }
+
+    public void addLeftPoses() {
+        blueLeftPoses.add(new Pose2d(3.185, 4.182, Rotation2d.fromDegrees(0)));
+        blueLeftPoses.add(new Pose2d(3.695, 2.982, Rotation2d.fromDegrees(60)));
+        blueLeftPoses.add(new Pose2d(5.003, 2.795, Rotation2d.fromDegrees(120)));
+        blueLeftPoses.add(new Pose2d(5.795, 3.861, Rotation2d.fromDegrees(180)));
+        blueLeftPoses.add(new Pose2d(5.290, 5.077, Rotation2d.fromDegrees(-120)));
+        blueLeftPoses.add(new Pose2d(3.977, 5.241, Rotation2d.fromDegrees(-60)));
+        redLeftPoses.add(new Pose2d(11.755, 4.189, Rotation2d.fromDegrees(0)));
+        redLeftPoses.add(new Pose2d(12.260, 2.959, Rotation2d.fromDegrees(60)));
+        redLeftPoses.add(new Pose2d(13.573, 2.809, Rotation2d.fromDegrees(120)));
+        redLeftPoses.add(new Pose2d(14.379, 3.847, Rotation2d.fromDegrees(180)));
+        redLeftPoses.add(new Pose2d(13.860, 5.077, Rotation2d.fromDegrees(-120)));
+        redLeftPoses.add(new Pose2d(12.561, 5.241, Rotation2d.fromDegrees(-60)));
+    }
+
+    public void addRightPoses() {
+        blueRightPoses.add(new Pose2d(3.185, 3.847, Rotation2d.fromDegrees(0)));
+        blueRightPoses.add(new Pose2d(3.977, 2.809, Rotation2d.fromDegrees(60)));
+        blueRightPoses.add(new Pose2d(5.303, 2.973, Rotation2d.fromDegrees(120)));
+        blueRightPoses.add(new Pose2d(5.795, 4.182, Rotation2d.fromDegrees(180)));
+        blueRightPoses.add(new Pose2d(5.003, 5.255, Rotation2d.fromDegrees(-120)));
+        blueRightPoses.add(new Pose2d(3.677, 5.064, Rotation2d.fromDegrees(-60)));
+        redRightPoses.add(new Pose2d(11.755, 3.847, Rotation2d.fromDegrees(0)));
+        redRightPoses.add(new Pose2d(12.561, 2.809, Rotation2d.fromDegrees(60)));
+        redRightPoses.add(new Pose2d(13.860, 2.986, Rotation2d.fromDegrees(120)));
+        redRightPoses.add(new Pose2d(14.365, 4.203, Rotation2d.fromDegrees(180)));
+        redRightPoses.add(new Pose2d(13.572, 5.244, Rotation2d.fromDegrees(-120)));
+        redRightPoses.add(new Pose2d(12.247, 5.064, Rotation2d.fromDegrees(-60)));
+    }
+
+    public APTarget convertPoseToTarget(Pose2d pose) {
+        APTarget target = new APTarget(pose).withEntryAngle(pose.getRotation());
+        return target;
     }
 
     @Override

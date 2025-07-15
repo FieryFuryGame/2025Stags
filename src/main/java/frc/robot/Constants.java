@@ -6,6 +6,11 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Degrees;
+
+import com.therekrab.autopilot.*;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -46,5 +51,14 @@ public final class Constants {
 
     public static final double kS = 0.25, kV = 0.12, kA = 0.01, kP = 4.8, kI = 0, kD = 0.1, kG = 0.3;
     public static final double mmCruiseVelocity = 80, mmAccel = 160, mmJerk = 1600;
+  }
+
+  public static class AutopilotConstants {
+    public static final APConstraints apConstraints = new APConstraints(6, 10, 5);
+    public static final APProfile apProfile = new APProfile().withConstraints(apConstraints)
+      .withErrorXY(Centimeters.of(2))
+      .withErrorTheta(Degrees.of(0.5))
+      .withBeelineRadius(Centimeters.of(8));
+    public static final Autopilot autopilot = new Autopilot(apProfile);
   }
 }

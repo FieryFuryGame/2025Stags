@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.LimelightHelpers.PoseEstimate;
-import frc.robot.commands.AlignToBranch;
 import frc.robot.commands.DecideWhereToPlaceCoral;
 import frc.robot.commands.EffectorPivot;
 import frc.robot.commands.Eject;
@@ -169,8 +168,14 @@ public class RobotContainer {
         Constants.OperatorConstants.operatorController.y().onTrue(Commands.runOnce(() -> effectorSimExtra.simulatedBeamBreak = false));
         
         // Pathfinding Controls
-        Constants.OperatorConstants.driverController.leftBumper().onTrue(new AlignToBranch(drivetrain, "Left").onlyIf(() -> effector.simulatedBeamBreak));
-        Constants.OperatorConstants.driverController.rightBumper().onTrue(new AlignToBranch(drivetrain, "Right").onlyIf(() -> effector.simulatedBeamBreak));
+        Constants.OperatorConstants.driverController.leftBumper().onTrue(Commands.runOnce(() -> drivetrain.setTargetToClosestLeftBranch()))
+            .whileTrue(drivetrain.alignmentCommand).onFalse(Commands.runOnce(() -> drivetrain.stop()));
+        Constants.OperatorConstants.driverController.rightBumper().onTrue(Commands.runOnce(() -> drivetrain.setTargetToClosestRightBranch()))
+            .whileTrue(drivetrain.alignmentCommand).onFalse(Commands.runOnce(() -> drivetrain.stop()));
+        Constants.OperatorConstants.operatorController.leftBumper().onTrue(Commands.runOnce(() -> extraDriver.setTargetToClosestLeftBranch()))
+            .whileTrue(extraDriver.alignmentCommand).onFalse(Commands.runOnce(() -> drivetrain.stop()));
+        Constants.OperatorConstants.operatorController.rightBumper().onTrue(Commands.runOnce(() -> extraDriver.setTargetToClosestRightBranch()))
+            .whileTrue(extraDriver.alignmentCommand).onFalse(Commands.runOnce(() -> drivetrain.stop()));
         
         // Elevator State Control    
         Constants.OperatorConstants.driverController.povUp().onTrue(elevatorSim.setState(ElevatorState.L3));
